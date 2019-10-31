@@ -11,6 +11,7 @@
 #include <blockencodings.h>
 #include <chainparams.h>
 #include <consensus/validation.h>
+#include <ctime> // Cybersecurity Lab
 #include <hash.h>
 #include <validation.h>
 #include <merkleblock.h>
@@ -823,7 +824,7 @@ void Misbehaving(NodeId pnode, int howmuch, const std::string& message) EXCLUSIV
     int banscore = gArgs.GetArg("-banscore", DEFAULT_BANSCORE_THRESHOLD);
 
     std::string message_prefixed = message.empty() ? "" : (": " + message);
-    LogPrintf("\n\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!n*** Node %d has been misbehaving! (\"%s\")! Misbehavior score = %d (%d added) (%d before ban)", pnode, message_prefixed, state->nMisbehavior, howmuch, banscore); // Simeon
+    LogPrintf("\n\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!n*** Node %d has been misbehaving! (\"%s\")! Misbehavior score = %d (%d added) (%d before ban)", pnode, message_prefixed, state->nMisbehavior, howmuch, banscore); // Cybersecurity Lab
 
     if (state->nMisbehavior >= banscore && state->nMisbehavior - howmuch < banscore)
     {
@@ -930,7 +931,7 @@ void PeerLogicValidation::NewPoWValidBlock(const CBlockIndex *pindex, const std:
         return;
     nHighestFastAnnounce = pindex->nHeight;
 
-    LogPrintf("\n********************************************************************************\n*** New block was found! height=%d", pindex->nHeight); // Simeon
+    LogPrintf("\n********************************************************************************\n*** New block was found! height=%d", pindex->nHeight); // Cybersecurity Lab
 
     bool fWitnessEnabled = IsWitnessEnabled(pindex->pprev, Params().GetConsensus());
     uint256 hashBlock(pblock->GetHash());
@@ -1649,10 +1650,27 @@ void static ProcessOrphanTx(CConnman* connman, std::set<uint256>& orphan_work_se
     }
 }
 
-bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv, int64_t nTimeReceived, const CChainParams& chainparams, CConnman* connman, const std::atomic<bool>& interruptMsgProc, bool enable_bip61)
-{
-    LogPrintf("\n*** Message *** id=%d addr=%s *** cmd=%s", pfrom->GetId(), pfrom->addr.ToString(), strCommand); // Simeon
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Genuine ProcessMessage protocol
+bool static _ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv, int64_t nTimeReceived, const CChainParams& chainparams, CConnman* connman, const std::atomic<bool>& interruptMsgProc, bool enable_bip61)
+{
+    //LogPrintf("\n*** Message *** id=%d addr=%s *** cmd=%s", pfrom->GetId(), pfrom->addr.ToString(), strCommand); // Cybersecurity Lab
     LogPrint(BCLog::NET, "received: %s (%u bytes) peer=%d\n", SanitizeString(strCommand), vRecv.size(), pfrom->GetId());
     if (gArgs.IsArgSet("-dropmessagestest") && GetRand(gArgs.GetArg("-dropmessagestest", 0)) == 0)
     {
@@ -2593,7 +2611,7 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
         } // cs_main
 
         if (fProcessBLOCKTXN)
-            return ProcessMessage(pfrom, NetMsgType::BLOCKTXN, blockTxnMsg, nTimeReceived, chainparams, connman, interruptMsgProc, enable_bip61);
+            return _ProcessMessage(pfrom, NetMsgType::BLOCKTXN, blockTxnMsg, nTimeReceived, chainparams, connman, interruptMsgProc, enable_bip61);
 
         if (fRevertToHeaderProcessing) {
             // Headers received from HB compact block peers are permitted to be
@@ -2800,7 +2818,7 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
     }
 
     if (strCommand == NetMsgType::MEMPOOL) {
-        LogPrintf("\n\n*** Sending mempool to %s", pfrom); // Simeon
+        LogPrintf("\n\n*** Sending mempool to %s", pfrom); // Cybersecurity Lab
 
         if (!(pfrom->GetLocalServices() & NODE_BLOOM) && !pfrom->fWhitelisted)
         {
@@ -2974,6 +2992,79 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
     LogPrint(BCLog::NET, "Unknown command \"%s\" from peer=%d\n", SanitizeString(strCommand), pfrom->GetId());
     return true;
 }
+
+// Wrapper to time message processing, overrides ProcessMessage
+bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv, int64_t nTimeReceived, const CChainParams& chainparams, CConnman* connman, const std::atomic<bool>& interruptMsgProc, bool enable_bip61)
+{
+  // Timer start
+  clock_t begin = clock();
+
+  // Execute the real ProcessMessage protocol
+  bool result = _ProcessMessage(pfrom, strCommand, vRecv, nTimeReceived, chainparams, connman, interruptMsgProc, enable_bip61);
+
+  // Timer end
+  clock_t end = clock();
+  int elapsed_time = end - begin;
+  if(elapsed_time < 0) elapsed_time = -elapsed_time;
+
+
+
+
+
+
+
+
+
+  // Cybersecurity Lab: Tracking all message times
+  ////////////////////////////////////////////////////////////////////////
+  // "FILTERLOAD", "FILTERADD", "FILTERCLEAR", "REJECT", "VERSION", "VERACK",
+  // "ADDR", "SENDHEADERS", "SENDCMPCT", "INV", "GETDATA", "GETBLOCKS", "GETBLOCKTXN",
+  // "GETHEADERS", "TX", "CMPCTBLOCK", "BLOCKTXN", "HEADERS", "BLOCK", "GETADDR",
+  // "MEMPOOL", "PING", "PONG", "FEEFILTER", "NOTFOUND"
+  int commandIndex = -1;
+  if (strCommand == NetMsgType::FILTERLOAD) commandIndex = 0;
+  else if(strCommand == NetMsgType::FILTERADD) commandIndex = 2;
+  else if(strCommand == NetMsgType::FILTERCLEAR) commandIndex = 4;
+  else if(strCommand == NetMsgType::REJECT) commandIndex = 6;
+  else if(strCommand == NetMsgType::VERSION) commandIndex = 8;
+  else if(strCommand == NetMsgType::VERACK) commandIndex = 10;
+  else if(strCommand == NetMsgType::ADDR) commandIndex = 12;
+  else if(strCommand == NetMsgType::SENDHEADERS) commandIndex = 14;
+  else if(strCommand == NetMsgType::SENDCMPCT) commandIndex = 16;
+  else if(strCommand == NetMsgType::INV) commandIndex = 18;
+  else if(strCommand == NetMsgType::GETDATA) commandIndex = 20;
+  else if(strCommand == NetMsgType::GETBLOCKS) commandIndex = 22;
+  else if(strCommand == NetMsgType::GETBLOCKTXN) commandIndex = 24;
+  else if(strCommand == NetMsgType::GETHEADERS) commandIndex = 26;
+  else if(strCommand == NetMsgType::TX) commandIndex = 28;
+  else if(strCommand == NetMsgType::CMPCTBLOCK) commandIndex = 30;
+  else if(strCommand == NetMsgType::BLOCKTXN) commandIndex = 32;
+  else if(strCommand == NetMsgType::HEADERS) commandIndex = 34;
+  else if(strCommand == NetMsgType::BLOCK) commandIndex = 36;
+  else if(strCommand == NetMsgType::GETADDR) commandIndex = 38;
+  else if(strCommand == NetMsgType::MEMPOOL) commandIndex = 40;
+  else if(strCommand == NetMsgType::PING) commandIndex = 42;
+  else if(strCommand == NetMsgType::PONG) commandIndex = 44;
+  else if(strCommand == NetMsgType::FEEFILTER) commandIndex = 46;
+  else if(strCommand == NetMsgType::NOTFOUND) commandIndex = 48;
+
+  if(commandIndex != -1) {
+    (pfrom->timePerMessage)[commandIndex] += elapsed_time;
+    (pfrom->timePerMessage)[commandIndex + 1]++;
+  } else {
+    LogPrintf("\n***************************************** Undocumented research message ... ? : ");
+  }
+
+  LogPrintf("\n*** Message *** id=%d addr=%s *** cmd=%s *** cycles=%f", pfrom->GetId(), pfrom->addr.ToString(), strCommand, elapsed_time); // Cybersecurity Lab
+
+
+  return result;
+}
+
+
+
+
+
 
 bool PeerLogicValidation::SendRejectsAndCheckIfBanned(CNode* pnode, bool enable_bip61) EXCLUSIVE_LOCKS_REQUIRED(cs_main)
 {
@@ -3584,7 +3675,7 @@ bool PeerLogicValidation::SendMessages(CNode* pto)
                 if (!pto->fRelayTxes) pto->setInventoryTxToSend.clear();
             }
 
-            // Simeon
+            // Cybersecurity Lab
             // Respond to BIP35 mempool requests
             if (fSendTrickle && pto->fSendMempool) {
                 auto vtxinfo = mempool.infoAll();    // Get mempool information

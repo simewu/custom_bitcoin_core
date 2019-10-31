@@ -18,6 +18,20 @@ from test_framework.mininode import P2PDataStore
 from test_framework.test_framework import BitcoinTestFramework
 from test_framework.util import assert_equal
 
+""" // Cybersecurity Lab
+my_block = create_block(tip, create_coinbase(height), block_time)
+block_time += 1
+my_block.vtx[0].vout[0].nValue = 100 * COIN  # Too high!
+my_block.vtx[0].sha256 = None
+my_block.vtx[0].calc_sha256()
+my_block.hashMerkleRoot = my_block.calc_merkle_root()
+my_block.rehash()
+my_block.solve()
+"""
+
+node.p2p.send_blocks_and_test([block3], node, success=False, reject_reason='bad-cb-amount')
+
+
 class InvalidBlockRequestTest(BitcoinTestFramework):
     def set_test_params(self):
         self.num_nodes = 1

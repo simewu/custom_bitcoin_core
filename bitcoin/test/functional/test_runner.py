@@ -67,6 +67,9 @@ TEST_EXIT_PASSED = 0
 TEST_EXIT_SKIPPED = 77
 
 BASE_SCRIPTS = [
+    # // Cybersecurity Lab test Scripts
+    'p2p_my_invalid_block.py',
+    'p2p_my_invalid_messages.py',
     # Scripts that are run by the travis build process.
     # Longest test should go first, to favor running tests in parallel
     'feature_fee_estimation.py',

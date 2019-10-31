@@ -10,6 +10,7 @@
 #include <core_io.h>
 #include <net.h>
 #include <net_processing.h>
+#include <netmessagemaker.h> // Cybersecurity Lab
 #include <netbase.h>
 #include <policy/policy.h>
 #include <rpc/protocol.h>
@@ -26,7 +27,7 @@
 #include <univalue.h>
 
 
-// Simeon
+// Cybersecurity Lab
 static UniValue requestmempools(const JSONRPCRequest& request)
 {
     if (request.fHelp || request.params.size() != 0)
@@ -48,6 +49,100 @@ static UniValue requestmempools(const JSONRPCRequest& request)
     g_connman->ForEachNode([](CNode* pnode) {
         LOCK(pnode->cs_inventory);
         pnode->fSendMempool = true;
+    });
+    return NullUniValue;
+}
+
+// Cybersecurity Lab
+static UniValue sendCustomMessage(const JSONRPCRequest& request)
+{
+    if (request.fHelp || request.params.size() != 0)
+        throw std::runtime_error(
+            RPCHelpMan{"send",
+                "\nSend a message.\n",
+                {
+                  {"msg", RPCArg::Type::STR, RPCArg::Optional::NO, "Message type"},
+                },
+                RPCResults{},
+                RPCExamples{
+                    HelpExampleCli("send", "msg")
+            + HelpExampleRpc("send", "msg")
+                },
+            }.ToString());
+
+    if(!g_connman)
+        throw JSONRPCError(RPC_CLIENT_P2P_DISABLED, "Error: Peer-to-peer functionality missing or disabled");
+
+    std::string msg = request.params[0].get_str();
+    //return msg;
+    // Request that each node send a ping during next message processing pass
+    connman->ForEachNode([msg](CNode* pnode) {
+        LOCK(pnode->cs_inventory);
+
+        if (msg == "filterload") {
+        } else if(msg == "filteradd") {
+        } else if(msg == "filterclear") {
+        } else if(msg == "reject") {
+        } else if(msg == "version") {
+        } else if(msg == "verack") {
+        } else if(msg == "addr") {
+        } else if(msg == "sendheaders") {
+        } else if(msg == "sendcmpct") {
+        } else if(msg == "inv") {
+        } else if(msg == "getdata") {
+        } else if(msg == "getblocks") {
+        } else if(msg == "getblocktxn") {
+        } else if(msg == "getheaders") {
+        } else if(msg == "tx") {
+        } else if(msg == "cmpctblock") {
+        } else if(msg == "blocktxn") {
+        } else if(msg == "headers") {
+        } else if(msg == "block") {
+        } else if(msg == "getaddr") {
+          connman->PushMessage(pnode, CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::GETADDR));
+        } else if(msg == "mempool") {
+        } else if(msg == "ping") {
+          uint64_t nonce = 0;
+          while (nonce == 0) {
+              GetRandBytes((unsigned char*)&nonce, sizeof(nonce));
+          }
+          pto->fPingQueued = false;
+          pto->nPingUsecStart = GetTimeMicros();
+          if (pto->nVersion > BIP0031_VERSION) {
+              pto->nPingNonceSent = nonce;
+              connman->PushMessage(pto, msgMaker.Make(NetMsgType::PING, nonce));
+          }
+        } else if(msg == "pong") {
+          connman->PushMessage(pto, msgMaker.Make(NetMsgType::PING));
+        } else if(msg == "feefilter") {
+        } else if(msg == "notfound") {
+        }
+    });
+    return msg;//NullUniValue;
+}
+
+// Cybersecurity Lab
+static UniValue getaddr(const JSONRPCRequest& request)
+{
+    if (request.fHelp || request.params.size() != 0)
+        throw std::runtime_error(
+            RPCHelpMan{"getaddr",
+                "\nRequests addresses.\n",
+                {},
+                RPCResults{},
+                RPCExamples{
+                    HelpExampleCli("getaddr", "")
+            + HelpExampleRpc("getaddr", "")
+                },
+            }.ToString());
+
+    if(!g_connman)
+        throw JSONRPCError(RPC_CLIENT_P2P_DISABLED, "Error: Peer-to-peer functionality missing or disabled");
+
+    // Request that each node send a ping during next message processing pass
+    g_connman->ForEachNode([](CNode* pnode) {
+        LOCK(pnode->cs_inventory);
+        g_connman->PushMessage(pnode, CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::GETADDR));
     });
     return NullUniValue;
 }
@@ -100,20 +195,20 @@ static UniValue ping(const JSONRPCRequest& request)
     return NullUniValue;
 }
 
-// Simeon
-static UniValue misbehavior(const JSONRPCRequest& request)
+// Cybersecurity Lab
+static UniValue list(const JSONRPCRequest& request)
 {
     if (request.fHelp || request.params.size() != 0)
         throw std::runtime_error(
-            RPCHelpMan{"misbehavior",
+            RPCHelpMan{"list",
                 "\nGet the misbehavior score for each peer.\n",
                 {},
                 RPCResult{
             "[\n*\n"
                 },
                 RPCExamples{
-                    HelpExampleCli("misbehavior", "")
-            + HelpExampleRpc("misbehavior", "")
+                    HelpExampleCli("list", "")
+            + HelpExampleRpc("list", "")
                 },
             }.ToString());
 
@@ -804,8 +899,10 @@ static UniValue getnodeaddresses(const JSONRPCRequest& request)
 static const CRPCCommand commands[] =
 { //  category              name                      actor (function)         argNames
   //  --------------------- ------------------------  -----------------------  ----------
-    { "simeon suite",       "requestmempools",        &requestmempools,        {} },
-    { "simeon suite",       "misbehavior",            &misbehavior,            {} },
+    { "DoS suite",          "send",                   &sendCustomMessage,      {"msg"} },
+    { "DoS suite",          "requestmempools",        &requestmempools,        {} },
+    { "DoS suite",          "getaddr",                &getaddr,                {} },
+    { "DoS suite",          "list",                   &list,                   {} },
     { "network",            "getconnectioncount",     &getconnectioncount,     {} },
     { "network",            "ping",                   &ping,                   {} },
     { "network",            "getpeerinfo",            &getpeerinfo,            {} },

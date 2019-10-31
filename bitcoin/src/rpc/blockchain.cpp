@@ -16,7 +16,8 @@
 #include <hash.h>
 #include <index/txindex.h>
 #include <key_io.h>
-#include <net_processing.h> // Simeon
+#include <net_processing.h> // Cybersecurity Lab
+#include <ctime> // Cybersecurity Lab
 #include <policy/feerate.h>
 #include <policy/policy.h>
 #include <policy/rbf.h>
@@ -1494,7 +1495,6 @@ UniValue mempoolInfoToJSON()
     ret.pushKV("usage", (int64_t) mempool.DynamicMemoryUsage());
     size_t maxmempool = gArgs.GetArg("-maxmempool", DEFAULT_MAX_MEMPOOL_SIZE) * 1000000;
     ret.pushKV("maxmempool", (int64_t) maxmempool);
-    ret.pushKV("Simeon", "was here"); // Simeon
     ret.pushKV("mempoolminfee", ValueFromAmount(std::max(mempool.GetMinFee(maxmempool), ::minRelayTxFee).GetFeePerK()));
     ret.pushKV("minrelaytxfee", ValueFromAmount(::minRelayTxFee.GetFeePerK()));
 
@@ -2299,33 +2299,39 @@ UniValue scantxoutset(const JSONRPCRequest& request)
     return result;
 }
 
-// Simeon
+// Cybersecurity Lab
 // Disconnect from all nodes
 static UniValue isolate(const JSONRPCRequest& request)
 {
-    if (request.fHelp || request.params.size() != 0)
+    if (request.fHelp || request.params.size() != 1)
         throw std::runtime_error(
             RPCHelpMan{"isolate",
                 "\nDisconnects all nodes.\n",
-                {}, RPCResult{
+                {
+                    {"address", RPCArg::Type::STR, RPCArg::Optional::NO, "Exception IP address"},
+                }, RPCResult{
             "{\n"
             "  \"x.x.x.x\": Disconnected,\n"
             "}\n"
                 },
                 RPCExamples{
-                    HelpExampleCli("isolate", "")
+                    HelpExampleCli("isolate", "192.168.0.85")
+                    + HelpExampleRpc("isolate", "192.168.0.85")
                 },
             }.ToString());
 
+    std::string address = request.params[0].get_str();
     UniValue result(UniValue::VOBJ);
-    g_connman->ForEachNode([&result](CNode* pnode) {
-        pnode->CloseSocketDisconnect();
-        result.pushKV(pnode->addr.ToString(), "Disconnected");
+    g_connman->ForEachNode([&result, &address](CNode* pnode) {
+        if(address != pnode->addr.ToString()) {
+          pnode->CloseSocketDisconnect();
+          result.pushKV(pnode->addr.ToString(), "Disconnected");
+        }
     });
     return result;
 }
 
-// Simeon
+// Cybersecurity Lab
 // Check the misbehavior scores
 static UniValue lastrequest(const JSONRPCRequest& request)
 {
@@ -2350,12 +2356,53 @@ static UniValue lastrequest(const JSONRPCRequest& request)
     return result;
 }
 
+// Cybersecurity Lab
+// Check the misbehavior scores
+static UniValue getmsginfo(const JSONRPCRequest& request)
+{
+    if (request.fHelp || request.params.size() != 0)
+        throw std::runtime_error(
+            RPCHelpMan{"getmsginfo",
+                "\nList out the computer message info.\n",
+                {}, RPCResult{
+            "{\n"
+            "  \"x.x.x.x\": 0,\n"
+            "}\n"
+                },
+                RPCExamples{
+                    HelpExampleCli("getmsginfo", "")
+                },
+            }.ToString());
+
+    std::vector<std::string> messageNames{"FILTERLOAD", "", "FILTERADD", "", "FILTERCLEAR", "", "REJECT", "", "VERSION", "", "VERACK", "", "ADDR", "", "SENDHEADERS", "", "SENDCMPCT", "", "INV", "", "GETDATA", "", "GETBLOCKS", "", "GETBLOCKTXN", "", "GETHEADERS", "", "TX", "", "CMPCTBLOCK", "", "BLOCKTXN", "", "HEADERS", "", "BLOCK", "", "GETADDR", "", "MEMPOOL", "", "PING", "", "PONG", "", "FEEFILTER", "", "NOTFOUND", ""};
+    std::vector<int> fullTimePerMessage{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+    std::vector<int> maxTimePerMessage{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+    UniValue result(UniValue::VOBJ);
+
+    g_connman->ForEachNode([&result, &fullTimePerMessage, &maxTimePerMessage](CNode* pnode) {
+        for(int i = 0; i < 50; i++) {
+          fullTimePerMessage[i] += (pnode->timePerMessage)[i];
+          if((pnode->timePerMessage)[i] > maxTimePerMessage[i]) maxTimePerMessage[i] = (pnode->timePerMessage)[i];
+        }
+    });
+    result.pushKV("CLOCKS PER SECOND", std::to_string(CLOCKS_PER_SEC));
+    for(int i = 0; i < 50; i+= 2) {
+        double seconds = 0;
+        if(fullTimePerMessage[i + 1] != 0) {
+          seconds = (double)fullTimePerMessage[i] / (double)fullTimePerMessage[i + 1];
+        }
+        result.pushKV(messageNames[i], std::to_string(fullTimePerMessage[i]) + " / " + std::to_string(fullTimePerMessage[i + 1]) + " = " + std::to_string(seconds) + " clocks on average (max=" + std::to_string(maxTimePerMessage[i]) + ")");
+    }
+    return result;
+}
+
 // clang-format off
 static const CRPCCommand commands[] =
 { //  category              name                      actor (function)         argNames
   //  --------------------- ------------------------  -----------------------  ----------
-    { "simeon suite",       "isolate",                &isolate,                {} },
-    { "simeon suite",       "lastrequest",            &lastrequest,     {} },
+    { "DoS suite",          "isolate",                &isolate,                {"address"} },
+    { "DoS suite",          "lastrequest",            &lastrequest,            {} },
+    { "DoS suite",          "getmsginfo",             &getmsginfo,             {} },
     { "blockchain",         "getblockchaininfo",      &getblockchaininfo,      {} },
     { "blockchain",         "getchaintxstats",        &getchaintxstats,        {"nblocks", "blockhash"} },
     { "blockchain",         "getblockstats",          &getblockstats,          {"hash_or_height", "stats"} },

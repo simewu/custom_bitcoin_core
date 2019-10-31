@@ -1307,7 +1307,7 @@ void CConnman::SocketHandler()
             }
             if (nBytes > 0)
             {
-                //LogPrintf("*"); // Simeon
+                //LogPrintf("*"); // Cybersecurity Lab
                 bool notify = false;
                 if (!pnode->ReceiveMsgBytes(pchBuf, nBytes, notify))
                     pnode->CloseSocketDisconnect();
@@ -2752,7 +2752,7 @@ int64_t CConnman::PoissonNextSendInbound(int64_t now, int average_interval_secon
 }
 
 int64_t PoissonNextSend(int64_t now, int average_interval_seconds)
-{ // Simeon
+{ // Cybersecurity Lab
     int64_t delay = now + (int64_t)(log1p(GetRand(1ULL << 48) * -0.0000000000000035527136788 /* -1/2^48 */) * average_interval_seconds * -1000000.0 + 0.5);
     //LogPrintf("&");//, (delay - now));
     return delay;
