@@ -168,6 +168,30 @@ static UniValue sendCustomMessage(const JSONRPCRequest& request)
     return msg + " was sent.";//NullUniValue;
 }
 
+/*
+// Cybersecurity Lab
+static UniValue DoS(const JSONRPCRequest& request)
+{
+      if (request.fHelp || request.params.size() != 1)
+          throw std::runtime_error(
+              RPCHelpMan{"dos",
+                  "\nSend a message repea.\n",
+                  {
+                    {"msg", RPCArg::Type::STR, RPCArg::Optional::NO, "Message type"},
+                  },
+                  RPCResults{},
+                  RPCExamples{
+                      HelpExampleCli("send", "msg")
+              + HelpExampleRpc("send", "msg")
+                  },
+              }.ToString());
+
+      if(!g_connman)
+          throw JSONRPCError(RPC_CLIENT_P2P_DISABLED, "Error: Peer-to-peer functionality missing or disabled");
+
+      std::string msg = request.params[0].get_str();
+}*/
+
 // Cybersecurity Lab
 static UniValue getaddr(const JSONRPCRequest& request)
 {

@@ -3047,6 +3047,7 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
   else if(strCommand == NetMsgType::PONG) commandIndex = 44;
   else if(strCommand == NetMsgType::FEEFILTER) commandIndex = 46;
   else if(strCommand == NetMsgType::NOTFOUND) commandIndex = 48;
+  else if(strCommand == NetMsgType::MERKLEBLOCK) commandIndex = 48;
 
   if(commandIndex != -1) {
     (pfrom->timePerMessage)[commandIndex] += elapsed_time;
