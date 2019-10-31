@@ -159,9 +159,13 @@ static UniValue sendCustomMessage(const JSONRPCRequest& request)
           g_connman->PushMessage(pnode, CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::FEEFILTER));
         } else if(msg == "notfound") {
           g_connman->PushMessage(pnode, CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::NOTFOUND));
+        } else if(msg == "merkleblock") {
+          g_connman->PushMessage(pnode, CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::MERKLEBLOCK));
+        } else {
+          throw JSONRPCError(RPC_CLIENT_P2P_DISABLED, "Please enter a valid message type.");
         }
     });
-    return msg;//NullUniValue;
+    return msg + " was sent.";//NullUniValue;
 }
 
 // Cybersecurity Lab
