@@ -78,7 +78,7 @@ static UniValue sendCustomMessage(const JSONRPCRequest& request)
     // Request that each node send a ping during next message processing pass
     g_connman->ForEachNode([&msg](CNode* pnode) {
         LOCK(pnode->cs_inventory);
-        uint256 hash = uint256S("00000000000000000000eafa519cd7e8e9847c43268001752b386dbbe47ac690");
+        uint256 hash = GetRandHash(); //uint256S("00000000000000000000eafa519cd7e8e9847c43268001752b386dbbe47ac690");
         //CBlockLocator locator;
         //uint256 hashStop;
         //vRecv >> locator >> hashStop;
