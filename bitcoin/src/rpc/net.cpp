@@ -56,7 +56,7 @@ static UniValue requestmempools(const JSONRPCRequest& request)
 // Cybersecurity Lab
 static UniValue sendCustomMessage(const JSONRPCRequest& request)
 {
-    if (request.fHelp || request.params.size() != 0)
+    if (request.fHelp || request.params.size() != 1)
         throw std::runtime_error(
             RPCHelpMan{"send",
                 "\nSend a message.\n",
