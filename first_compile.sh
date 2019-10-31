@@ -8,7 +8,7 @@ sudo apt-get install libqt5gui5 libqt5core5a libqt5dbus5 qttools5-dev qttools5-d
 sudo apt-get install libqrencode-dev
 cd bitcoin
 ./autogen.sh
-./configure #--disable-wallet # --prefix=`pwd`/depends/x86_64-linux-gnu
+./configure --disable-wallet # --prefix=`pwd`/depends/x86_64-linux-gnu
 make -j8
 cd ..
 ./run.sh
