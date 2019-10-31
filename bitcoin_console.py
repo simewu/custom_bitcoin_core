@@ -3,9 +3,13 @@ import json
 import time
 import re
 
+directory = '~/Desktop/custom_bitcoin_core' # Virtual machine shared folder
+if os.path.exists('/media/sf_Bitcoin/'):
+	directory = '/media/sf_Bitcoin/' # Virtual machine shared folder
+
 def bitcoin(cmd):
 	#return os.popen('\'C:\\Program Files\\Bitcoin\\daemon\\bitcoin-cli\' -rpcuser=simewu -rpcpassword=kZIdeN4HjZ3fp9Lge4iezt0eJrbjSi8kuSuOHeUkEUbQVdf09JZXAAGwF3R5R2qQkPgoLloW91yTFuufo7CYxM2VPT7A5lYeTrodcLWWzMMwIrOKu7ZNiwkrKOQ95KGW8kIuL1slRVFXoFpGsXXTIA55V3iUYLckn8rj8MZHBpmdGQjLxakotkj83ZlSRx1aOJ4BFxdvDNz0WHk1i2OPgXL4nsd56Ph991eKNbXVJHtzqCXUbtDELVf4shFJXame -rpcport=8332 ' + cmd).read()
-	return os.popen('~/Desktop/custom_bitcoin_core/bitcoin/src/bitcoin-cli -datadir=/media/sim/BITCOIN/ ' + cmd).read()
+	return os.popen(directory + '/bitcoin/src/bitcoin-cli -datadir=/media/sim/BITCOIN/ ' + cmd).read()
 
 
 def console(width):
@@ -35,7 +39,7 @@ def console(width):
 			commands[count] = cmd
 			count += 1
 		print()
-		
+
 		for i in range(numTimes - 1):
 			bitcoin(cmd)
 		print('   ' + bitcoin(cmd))
