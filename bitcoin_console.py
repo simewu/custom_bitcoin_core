@@ -16,7 +16,13 @@ def console(width):
 	count = 1
 	commands = {}
 	while True:
+		numTimes = 1
 		cmd = input(str(count).ljust(4) + '>   ')
+		cmds = re.split(r'\s*\*\s*(?=[0-9]+$)', cmd)
+		if len(cmds) == 2: # Add command multiplier
+			cmd = cmds[0]
+			numTimes = int(cmds[1])
+
 		if len(cmd) == 0:
 			cmd = count - 1
 		elif re.match(r'[0-9]+', cmd):
@@ -29,6 +35,9 @@ def console(width):
 			commands[count] = cmd
 			count += 1
 		print()
+		
+		for i in range(numTimes - 1):
+			bitcoin(cmd)
 		print('   ' + bitcoin(cmd))
 		print('-' * width)
 
