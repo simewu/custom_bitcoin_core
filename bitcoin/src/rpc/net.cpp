@@ -76,46 +76,89 @@ static UniValue sendCustomMessage(const JSONRPCRequest& request)
     std::string msg = request.params[0].get_str();
     //return msg;
     // Request that each node send a ping during next message processing pass
-    connman->ForEachNode([msg](CNode* pnode) {
+    g_connman->ForEachNode([&msg](CNode* pnode) {
         LOCK(pnode->cs_inventory);
+        uint256 hash = uint256S("00000000000000000000eafa519cd7e8e9847c43268001752b386dbbe47ac690");
+        //CBlockLocator locator;
+        //uint256 hashStop;
+        //vRecv >> locator >> hashStop;
+
 
         if (msg == "filterload") {
         } else if(msg == "filteradd") {
+          g_connman->PushMessage(pnode, CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::FILTERADD));
         } else if(msg == "filterclear") {
+          g_connman->PushMessage(pnode, CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::FILTERCLEAR));
         } else if(msg == "reject") {
+          //g_connman->PushMessage(pnode, CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::REJECT));
+
+          //! List of asynchronously-determined block rejections to notify this peer about.
+          struct CBlockReject {
+              unsigned char chRejectCode;
+              std::string strRejectReason;
+              uint256 hashBlock;
+          };
+          // MAX_REJECT_MESSAGE_LENGTH
+          CBlockReject reject = {0, "Error", hash};
+          g_connman->PushMessage(pnode, CNetMsgMaker(INIT_PROTO_VERSION).Make(NetMsgType::REJECT, std::string(NetMsgType::BLOCK), reject.chRejectCode, reject.strRejectReason, reject.hashBlock));
+
         } else if(msg == "version") {
+          g_connman->PushMessage(pnode, CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::VERSION));
         } else if(msg == "verack") {
+          g_connman->PushMessage(pnode, CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::VERACK));
         } else if(msg == "addr") {
+          g_connman->PushMessage(pnode, CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::ADDR));
         } else if(msg == "sendheaders") {
+          g_connman->PushMessage(pnode, CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::SENDHEADERS));
         } else if(msg == "sendcmpct") {
+          g_connman->PushMessage(pnode, CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::SENDCMPCT));
         } else if(msg == "inv") {
+          g_connman->PushMessage(pnode, CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::INV));
         } else if(msg == "getdata") {
+          g_connman->PushMessage(pnode, CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::GETDATA));
+          // Find the last block the caller has in the main chain
+          //const CBlockIndex* pindex = FindForkInGlobalIndex(chainActive, locator);
+          //std::vector<CInv> vGetData;
+          //vGetData.push_back(CInv(MSG_BLOCK | MSG_WITNESS_FLAG, pindex->GetBlockHash()));
+          ////MarkBlockAsInFlight(pfrom->GetId(), pindex->GetBlockHash(), pindex);
+          //  g_connman->PushMessage(pnode, CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::GETDATA, vGetData));
         } else if(msg == "getblocks") {
+          g_connman->PushMessage(pnode, CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::GETBLOCKS));
         } else if(msg == "getblocktxn") {
+          g_connman->PushMessage(pnode, CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::GETBLOCKTXN));
         } else if(msg == "getheaders") {
+          g_connman->PushMessage(pnode, CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::GETHEADERS));
         } else if(msg == "tx") {
+          g_connman->PushMessage(pnode, CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::TX));
         } else if(msg == "cmpctblock") {
+          g_connman->PushMessage(pnode, CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::CMPCTBLOCK));
         } else if(msg == "blocktxn") {
+          g_connman->PushMessage(pnode, CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::BLOCKTXN));
         } else if(msg == "headers") {
+          g_connman->PushMessage(pnode, CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::HEADERS));
         } else if(msg == "block") {
+          g_connman->PushMessage(pnode, CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::BLOCK));
         } else if(msg == "getaddr") {
-          connman->PushMessage(pnode, CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::GETADDR));
+          g_connman->PushMessage(pnode, CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::GETADDR));
         } else if(msg == "mempool") {
+          g_connman->PushMessage(pnode, CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::MEMPOOL));
         } else if(msg == "ping") {
           uint64_t nonce = 0;
           while (nonce == 0) {
               GetRandBytes((unsigned char*)&nonce, sizeof(nonce));
           }
-          pto->fPingQueued = false;
-          pto->nPingUsecStart = GetTimeMicros();
-          if (pto->nVersion > BIP0031_VERSION) {
-              pto->nPingNonceSent = nonce;
-              connman->PushMessage(pto, msgMaker.Make(NetMsgType::PING, nonce));
+          pnode->fPingQueued = false;
+          pnode->nPingUsecStart = GetTimeMicros();
+          if (pnode->nVersion > BIP0031_VERSION) {
+              pnode->nPingNonceSent = nonce;
+              g_connman->PushMessage(pnode, CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::PING, nonce));
           }
         } else if(msg == "pong") {
-          connman->PushMessage(pto, msgMaker.Make(NetMsgType::PING));
+          g_connman->PushMessage(pnode, CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::PING));
         } else if(msg == "feefilter") {
+          g_connman->PushMessage(pnode, CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::FEEFILTER));
         } else if(msg == "notfound") {
+          g_connman->PushMessage(pnode, CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::NOTFOUND));
         }
     });
     return msg;//NullUniValue;
