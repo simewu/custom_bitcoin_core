@@ -56,7 +56,7 @@ static UniValue requestmempools(const JSONRPCRequest& request)
 // Cybersecurity Lab
 static UniValue sendCustomMessage(const JSONRPCRequest& request)
 {
-    if (request.fHelp || request.params.size() != 1)
+    if (request.fHelp || request.params.size() == 0 || request.params.size() > 2)
         throw std::runtime_error(
             RPCHelpMan{"send",
                 "\nSend a message.\n",
@@ -76,7 +76,7 @@ static UniValue sendCustomMessage(const JSONRPCRequest& request)
     std::string msg = request.params[0].get_str();
     //return msg;
     // Request that each node send a ping during next message processing pass
-    g_connman->ForEachNode([&msg](CNode* pnode) {
+    g_connman->ForEachNode([&msg, &request](CNode* pnode) {
         LOCK(pnode->cs_inventory);
         uint256 hash = GetRandHash(); //uint256S("00000000000000000000eafa519cd7e8e9847c43268001752b386dbbe47ac690");
         //CBlockLocator locator;
@@ -93,14 +93,11 @@ static UniValue sendCustomMessage(const JSONRPCRequest& request)
           //g_connman->PushMessage(pnode, CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::REJECT));
 
           //! List of asynchronously-determined block rejections to notify this peer about.
-          struct CBlockReject {
-              unsigned char chRejectCode;
-              std::string strRejectReason;
-              uint256 hashBlock;
-          };
           // MAX_REJECT_MESSAGE_LENGTH
-          CBlockReject reject = {0, "Error", hash};
-          g_connman->PushMessage(pnode, CNetMsgMaker(INIT_PROTO_VERSION).Make(NetMsgType::REJECT, std::string(NetMsgType::BLOCK), reject.chRejectCode, reject.strRejectReason, reject.hashBlock));
+          unsigned char chRejectCode = 0;
+          std::string strRejectReason = "Error";
+          uint256 hashBlock = hash;
+          g_connman->PushMessage(pnode, CNetMsgMaker(INIT_PROTO_VERSION).Make(NetMsgType::REJECT, std::string(NetMsgType::BLOCK), chRejectCode, strRejectReason, hashBlock));
 
         } else if(msg == "version") {
           g_connman->PushMessage(pnode, CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::VERSION));
@@ -161,6 +158,10 @@ static UniValue sendCustomMessage(const JSONRPCRequest& request)
           g_connman->PushMessage(pnode, CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::NOTFOUND));
         } else if(msg == "merkleblock") {
           g_connman->PushMessage(pnode, CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::MERKLEBLOCK));
+        } else if(request.params.size() == 2) {
+          std::string name = request.params[1].get_str();
+          CDataStream message(ParseHex(msg), SER_NETWORK, PROTOCOL_VERSION);
+          g_connman->PushMessage(pnode, CNetMsgMaker(PROTOCOL_VERSION).Make(name, message));
         } else {
           throw JSONRPCError(RPC_CLIENT_P2P_DISABLED, "Please enter a valid message type.");
         }

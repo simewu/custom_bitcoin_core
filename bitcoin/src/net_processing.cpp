@@ -3016,38 +3016,33 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
 
 
   // Cybersecurity Lab: Tracking all message times
-  ////////////////////////////////////////////////////////////////////////
-  // "FILTERLOAD", "FILTERADD", "FILTERCLEAR", "REJECT", "VERSION", "VERACK",
-  // "ADDR", "SENDHEADERS", "SENDCMPCT", "INV", "GETDATA", "GETBLOCKS", "GETBLOCKTXN",
-  // "GETHEADERS", "TX", "CMPCTBLOCK", "BLOCKTXN", "HEADERS", "BLOCK", "GETADDR",
-  // "MEMPOOL", "PING", "PONG", "FEEFILTER", "NOTFOUND"
   int commandIndex = -1;
-  if (strCommand == NetMsgType::FILTERLOAD) commandIndex = 0;
-  else if(strCommand == NetMsgType::FILTERADD) commandIndex = 2;
-  else if(strCommand == NetMsgType::FILTERCLEAR) commandIndex = 4;
-  else if(strCommand == NetMsgType::REJECT) commandIndex = 6;
-  else if(strCommand == NetMsgType::VERSION) commandIndex = 8;
-  else if(strCommand == NetMsgType::VERACK) commandIndex = 10;
-  else if(strCommand == NetMsgType::ADDR) commandIndex = 12;
-  else if(strCommand == NetMsgType::SENDHEADERS) commandIndex = 14;
-  else if(strCommand == NetMsgType::SENDCMPCT) commandIndex = 16;
-  else if(strCommand == NetMsgType::INV) commandIndex = 18;
-  else if(strCommand == NetMsgType::GETDATA) commandIndex = 20;
-  else if(strCommand == NetMsgType::GETBLOCKS) commandIndex = 22;
-  else if(strCommand == NetMsgType::GETBLOCKTXN) commandIndex = 24;
-  else if(strCommand == NetMsgType::GETHEADERS) commandIndex = 26;
-  else if(strCommand == NetMsgType::TX) commandIndex = 28;
-  else if(strCommand == NetMsgType::CMPCTBLOCK) commandIndex = 30;
-  else if(strCommand == NetMsgType::BLOCKTXN) commandIndex = 32;
-  else if(strCommand == NetMsgType::HEADERS) commandIndex = 34;
-  else if(strCommand == NetMsgType::BLOCK) commandIndex = 36;
-  else if(strCommand == NetMsgType::GETADDR) commandIndex = 38;
-  else if(strCommand == NetMsgType::MEMPOOL) commandIndex = 40;
-  else if(strCommand == NetMsgType::PING) commandIndex = 42;
-  else if(strCommand == NetMsgType::PONG) commandIndex = 44;
-  else if(strCommand == NetMsgType::FEEFILTER) commandIndex = 46;
-  else if(strCommand == NetMsgType::NOTFOUND) commandIndex = 48;
-  else if(strCommand == NetMsgType::MERKLEBLOCK) commandIndex = 50;
+  if(strCommand == NetMsgType::VERSION) commandIndex = 0;
+  else if(strCommand == NetMsgType::VERACK) commandIndex = 2;
+  else if(strCommand == NetMsgType::ADDR) commandIndex = 4;
+  else if(strCommand == NetMsgType::INV) commandIndex = 6;
+  else if(strCommand == NetMsgType::GETDATA) commandIndex = 8;
+  else if(strCommand == NetMsgType::MERKLEBLOCK) commandIndex = 10;
+  else if(strCommand == NetMsgType::GETBLOCKS) commandIndex = 12;
+  else if(strCommand == NetMsgType::GETHEADERS) commandIndex = 14;
+  else if(strCommand == NetMsgType::TX) commandIndex = 16;
+  else if(strCommand == NetMsgType::HEADERS) commandIndex = 18;
+  else if(strCommand == NetMsgType::BLOCK) commandIndex = 20;
+  else if(strCommand == NetMsgType::GETADDR) commandIndex = 22;
+  else if(strCommand == NetMsgType::MEMPOOL) commandIndex = 24;
+  else if(strCommand == NetMsgType::PING) commandIndex = 26;
+  else if(strCommand == NetMsgType::PONG) commandIndex = 28;
+  else if(strCommand == NetMsgType::NOTFOUND) commandIndex = 30;
+  else if (strCommand == NetMsgType::FILTERLOAD) commandIndex = 32;
+  else if(strCommand == NetMsgType::FILTERADD) commandIndex = 34;
+  else if(strCommand == NetMsgType::FILTERCLEAR) commandIndex = 36;
+  else if(strCommand == NetMsgType::SENDHEADERS) commandIndex = 38;
+  else if(strCommand == NetMsgType::FEEFILTER) commandIndex = 40;
+  else if(strCommand == NetMsgType::SENDCMPCT) commandIndex = 42;
+  else if(strCommand == NetMsgType::CMPCTBLOCK) commandIndex = 44;
+  else if(strCommand == NetMsgType::GETBLOCKTXN) commandIndex = 46;
+  else if(strCommand == NetMsgType::BLOCKTXN) commandIndex = 48;
+  else if(strCommand == NetMsgType::REJECT) commandIndex = 50;
 
   if(commandIndex != -1) {
     (pfrom->timePerMessage)[commandIndex] += elapsed_time;

@@ -2374,7 +2374,7 @@ static UniValue getmsginfo(const JSONRPCRequest& request)
                 },
             }.ToString());
 
-    std::vector<std::string> messageNames{"FILTERLOAD", "", "FILTERADD", "", "FILTERCLEAR", "", "REJECT", "", "VERSION", "", "VERACK", "", "ADDR", "", "SENDHEADERS", "", "SENDCMPCT", "", "INV", "", "GETDATA", "", "GETBLOCKS", "", "GETBLOCKTXN", "", "GETHEADERS", "", "TX", "", "CMPCTBLOCK", "", "BLOCKTXN", "", "HEADERS", "", "BLOCK", "", "GETADDR", "", "MEMPOOL", "", "PING", "", "PONG", "", "FEEFILTER", "", "NOTFOUND", "MERKLEBLOCK", ""};
+    std::vector<std::string> messageNames{"VERSION", "", "VERACK", "", "ADDR", "", "INV", "", "GETDATA", "", "MERKLEBLOCK", "", "GETBLOCKS", "", "GETHEADERS", "", "TX", "", "HEADERS", "", "BLOCK", "", "GETADDR", "", "MEMPOOL", "", "PING", "", "PONG", "", "NOTFOUND", "", "FILTERLOAD", "", "FILTERADD", "", "FILTERCLEAR", "", "SENDHEADERS", "", "FEEFILTER", "", "SENDCMPCT", "", "CMPCTBLOCK", "", "GETBLOCKTXN", "", "BLOCKTXN", ""};
     std::vector<int> fullTimePerMessage{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
     std::vector<int> maxTimePerMessage{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
     UniValue result(UniValue::VOBJ);
