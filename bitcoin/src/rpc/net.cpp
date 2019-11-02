@@ -62,11 +62,11 @@ static UniValue sendCustomMessage(const JSONRPCRequest& request)
                 "\nSend a message.\n",
                 {
                   {"msg", RPCArg::Type::STR, RPCArg::Optional::NO, "Message type"},
+                  {"msgname", RPCArg::Type::STR, /* default */ "None", "Message name (if msg is the raw message data)"},
                 },
                 RPCResults{},
                 RPCExamples{
-                    HelpExampleCli("send", "msg")
-            + HelpExampleRpc("send", "msg")
+                    HelpExampleCli("send", "msg[, msgname]") + HelpExampleRpc("send", "msg[, msgname]")
                 },
             }.ToString());
 
@@ -74,11 +74,17 @@ static UniValue sendCustomMessage(const JSONRPCRequest& request)
         throw JSONRPCError(RPC_CLIENT_P2P_DISABLED, "Error: Peer-to-peer functionality missing or disabled");
 
     std::string msg = request.params[0].get_str();
+    std::string msgname;
 
+    try {
+      msgname = request.params[1].get_str();
+    } catch(const std::exception& e) {
+      msgname = "None";
+    }
     CSerializedNetMsg netMsg;
 
 
-    g_connman->ForEachNode([&msg, &netMsg, &request](CNode* pnode) {
+    g_connman->ForEachNode([&msg, &msgname, &netMsg](CNode* pnode) {
         LOCK(pnode->cs_inventory);
         if (msg == "filterload") {
           netMsg = CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::FILTERLOAD);
@@ -175,11 +181,10 @@ static UniValue sendCustomMessage(const JSONRPCRequest& request)
         } else if(msg == "merkleblock") {
           netMsg = CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::MERKLEBLOCK);
           g_connman->PushMessage(pnode, CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::MERKLEBLOCK));
-        } else if(request.params.size() == 2) {
-          std::string name = request.params[1].get_str();
+        } else if(msgname != "None") {
           CDataStream message(ParseHex(msg), SER_NETWORK, PROTOCOL_VERSION);
-          netMsg = CNetMsgMaker(PROTOCOL_VERSION).Make(name, message);
-          g_connman->PushMessage(pnode, CNetMsgMaker(PROTOCOL_VERSION).Make(name, message));
+          netMsg = CNetMsgMaker(PROTOCOL_VERSION).Make(msgname, message);
+          g_connman->PushMessage(pnode, CNetMsgMaker(PROTOCOL_VERSION).Make(msgname, message));
         } else {
           throw JSONRPCError(RPC_CLIENT_P2P_DISABLED, "Please enter a valid message type.");
         }
@@ -200,8 +205,9 @@ static UniValue sendCustomMessage(const JSONRPCRequest& request)
       unsigned char c2 = (c & 0b11110000) / 16;
       data.push_back("0123456789ABCDEF"[c2]);
       data.push_back("0123456789ABCDEF"[c1]);
+      data.push_back(" ");
     }
-    return netMsg.command + " is in debug mode.\n" + data;//NullUniValue;
+    return netMsg.command + " was sent:\n" + data;//NullUniValue;
 }
 
 /*
@@ -1006,7 +1012,7 @@ static UniValue getnodeaddresses(const JSONRPCRequest& request)
 static const CRPCCommand commands[] =
 { //  category              name                      actor (function)         argNames
   //  --------------------- ------------------------  -----------------------  ----------
-    { "DoS suite",          "send",                   &sendCustomMessage,      {"msg"} },
+    { "DoS suite",          "send",                   &sendCustomMessage,      {"msg", "msgname"} },
     { "DoS suite",          "requestmempools",        &requestmempools,        {} },
     { "DoS suite",          "getaddr",                &getaddr,                {} },
     { "DoS suite",          "list",                   &list,                   {} },
