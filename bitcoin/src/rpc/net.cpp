@@ -121,14 +121,19 @@ static UniValue sendCustomMessage(const JSONRPCRequest& request)
           netMsg = CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::SENDCMPCT);
           g_connman->PushMessage(pnode, CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::SENDCMPCT));
         } else if(msg == "inv") {
-          netMsg = CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::INV);
-          g_connman->PushMessage(pnode, CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::INV));
+          std::vector<CInv> inv;
+          for(int i = 0; i < 50000; i++) {
+            inv.push_back(CInv(MSG_BLOCK, GetRandHash()));
+          }
+          netMsg = CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::GETDATA);
+          g_connman->PushMessage(pnode, CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::INV, inv));
         } else if(msg == "getdata") {
-          std::vector<CInv> vGetData;
-          //vGetData.push_back(CInv(MSG_BLOCK, GetRandHash()));
-          vGetData.push_back(CInv(MSG_BLOCK, GetRandHash()));
-          netMsg = CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::GETDATA, vGetData);
-          g_connman->PushMessage(pnode, CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::GETDATA, vGetData));
+          std::vector<CInv> inv;
+          for(int i = 0; i < 50000; i++) {
+            inv.push_back(CInv(MSG_BLOCK, GetRandHash()));
+          }
+          netMsg = CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::GETDATA);
+          g_connman->PushMessage(pnode, CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::GETDATA, inv));
           // Find the last block the caller has in the main chain
           //const CBlockIndex* pindex = FindForkInGlobalIndex(chainActive, locator);
           //std::vector<CInv> vGetData;
