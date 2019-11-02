@@ -124,8 +124,11 @@ static UniValue sendCustomMessage(const JSONRPCRequest& request)
           netMsg = CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::INV);
           g_connman->PushMessage(pnode, CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::INV));
         } else if(msg == "getdata") {
-          netMsg = CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::GETDATA);
-          g_connman->PushMessage(pnode, CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::GETDATA));
+          std::vector<CInv> vGetData;
+          //vGetData.push_back(CInv(MSG_BLOCK, GetRandHash()));
+          vGetData.push_back(CInv(MSG_BLOCK, GetRandHash()));
+          netMsg = CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::GETDATA, vGetData);
+          g_connman->PushMessage(pnode, CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::GETDATA, vGetData));
           // Find the last block the caller has in the main chain
           //const CBlockIndex* pindex = FindForkInGlobalIndex(chainActive, locator);
           //std::vector<CInv> vGetData;
@@ -205,7 +208,7 @@ static UniValue sendCustomMessage(const JSONRPCRequest& request)
       unsigned char c2 = (c & 0b11110000) / 16;
       data.push_back("0123456789ABCDEF"[c2]);
       data.push_back("0123456789ABCDEF"[c1]);
-      data.push_back(" ");
+      data.push_back(' ');
     }
     return netMsg.command + " was sent:\n" + data;//NullUniValue;
 }
