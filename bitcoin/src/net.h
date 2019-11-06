@@ -727,7 +727,7 @@ public:
     std::atomic<int64_t> timeLastMempoolReq{0};
 
     // Cybersecurity Lab: Used to track node data
-    std::vector<int> timePerMessage{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+    std::vector<int> timePerMessage{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 
     // Block and TXN accept times
     std::atomic<int64_t> nLastBlockTime{0};
