@@ -3056,7 +3056,6 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
     if(-1 == (pfrom->timePerMessage)[commandIndex + 4]) (pfrom->timePerMessage)[commandIndex + 4] = vRecvSize;
     if(-1 == (pfrom->timePerMessage)[commandIndex + 5]) (pfrom->timePerMessage)[commandIndex + 5] = 0;
     if(-1 == (pfrom->timePerMessage)[commandIndex + 6]) (pfrom->timePerMessage)[commandIndex + 6] = vRecvSize;
-
     (pfrom->timePerMessage)[commandIndex]++;
 
     // Min, avg, max of elapsed time
