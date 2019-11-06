@@ -3046,7 +3046,6 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
   else if(strCommand == NetMsgType::REJECT) commandIndex = 175;
 
   if(commandIndex != -1) {
-
     if(elapsed_time == -1) elapsed_time = 0; // So that the results dont reset from the value
     if(vRecvSize == -1) vRecvSize = 0;
 
