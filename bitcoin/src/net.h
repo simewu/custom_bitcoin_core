@@ -726,8 +726,8 @@ public:
     // Last time a "MEMPOOL" request was serviced.
     std::atomic<int64_t> timeLastMempoolReq{0};
 
-    // Cybersecurity Lab: Used to track node data
-    std::vector<int> timePerMessage{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+    // Cybersecurity Lab: Used to track node data, initialize all to -1
+    std::vector<int> timePerMessage{std::vector<int>(26 * 7, -1)}; // Alternating variables
 
     // Block and TXN accept times
     std::atomic<int64_t> nLastBlockTime{0};
