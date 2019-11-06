@@ -3048,6 +3048,7 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
   if(commandIndex != -1) {
     if(elapsed_time == -1) elapsed_time = 0; // So that the results dont reset from the value
     if(vRecvSize == -1) vRecvSize = 0;
+    
     if(-1 == (pfrom->timePerMessage)[commandIndex]) (pfrom->timePerMessage)[commandIndex] = 0;
     if(-1 == (pfrom->timePerMessage)[commandIndex + 1]) (pfrom->timePerMessage)[commandIndex + 1] = elapsed_time;
     if(-1 == (pfrom->timePerMessage)[commandIndex + 2]) (pfrom->timePerMessage)[commandIndex + 2] = 0;
