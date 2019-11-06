@@ -3074,7 +3074,6 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
   }
 
   LogPrintf("\n*** Message *** id=%d addr=%s *** cmd=%s *** cycles=%f *** bytes=%f", pfrom->GetId(), pfrom->addr.ToString(), strCommand, elapsed_time, vRecvSize); // Cybersecurity Lab
-
   return result;
 }
 
