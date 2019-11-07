@@ -2388,7 +2388,6 @@ static UniValue getmsginfo(const JSONRPCRequest& request)
     });
     result.pushKV("CLOCKS PER SECOND", std::to_string(CLOCKS_PER_SEC));
     for(int i = 0, j = 0; i < 26 * 5; i += 5, j++) {
-        int minseconds = 100000000, minbytes = 100000000;
         double seconds = 0, bytes = 0;
         int maxseconds = 0, maxbytes = 0;
         if(sumTimePerMessage[i] != 0) { // If the number of messages is not zero (avoid divide by zero)
