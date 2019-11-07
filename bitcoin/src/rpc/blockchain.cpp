@@ -2376,36 +2376,30 @@ static UniValue getmsginfo(const JSONRPCRequest& request)
 
     std::vector<std::string> messageNames{"VERSION", "VERACK", "ADDR", "INV", "GETDATA", "MERKLEBLOCK", "GETBLOCKS", "GETHEADERS", "TX", "HEADERS", "BLOCK", "GETADDR", "MEMPOOL", "PING", "PONG", "NOTFOUND", "FILTERLOAD", "FILTERADD", "FILTERCLEAR", "SENDHEADERS", "FEEFILTER", "SENDCMPCT", "CMPCTBLOCK", "GETBLOCKTXN", "BLOCKTXN", "REJECT"};
 
-    std::vector<int> minTimePerMessage(26 * 7, 100000000); // Alternating variables
-    std::vector<int> sumTimePerMessage(26 * 7); // Alternating variables
-    std::vector<int> maxTimePerMessage(26 * 7); // Alternating variables
+    std::vector<int> sumTimePerMessage(26 * 5); // Alternating variables
+    std::vector<int> maxTimePerMessage(26 * 5); // Alternating variables
     UniValue result(UniValue::VOBJ);
 
-    g_connman->ForEachNode([&result, &minTimePerMessage, &sumTimePerMessage, &maxTimePerMessage](CNode* pnode) {
+    g_connman->ForEachNode([&result, &sumTimePerMessage, &maxTimePerMessage](CNode* pnode) {
         for(int i = 0; i < 78; i++) {
-          if((pnode->timePerMessage)[i] != -1) {
-            if((pnode->timePerMessage)[i] < minTimePerMessage[i]) minTimePerMessage[i] = (pnode->timePerMessage)[i];
-            sumTimePerMessage[i] += (pnode->timePerMessage)[i];
-            if((pnode->timePerMessage)[i] > maxTimePerMessage[i]) maxTimePerMessage[i] = (pnode->timePerMessage)[i];
-          }
+          sumTimePerMessage[i] += (pnode->timePerMessage)[i];
+          if((pnode->timePerMessage)[i] > maxTimePerMessage[i]) maxTimePerMessage[i] = (pnode->timePerMessage)[i];
         }
     });
     result.pushKV("CLOCKS PER SECOND", std::to_string(CLOCKS_PER_SEC));
-    for(int i = 0, j = 0; i < 26 * 7; i += 7, j++) {
+    for(int i = 0, j = 0; i < 26 * 5; i += 5, j++) {
         int minseconds = 100000000, minbytes = 100000000;
         double seconds = 0, bytes = 0;
         int maxseconds = 0, maxbytes = 0;
-        minseconds = sumTimePerMessage[i + 1];
-        minbytes = sumTimePerMessage[i + 4];
         if(sumTimePerMessage[i] != 0) { // If the number of messages is not zero (avoid divide by zero)
-          seconds = (double)sumTimePerMessage[i + 2] / (double)sumTimePerMessage[i];
-          bytes = (double)sumTimePerMessage[i + 5] / (double)sumTimePerMessage[i];
+          seconds = (double)sumTimePerMessage[i + 1] / (double)sumTimePerMessage[i];
+          bytes = (double)sumTimePerMessage[i + 3] / (double)sumTimePerMessage[i];
         }
-        maxseconds = sumTimePerMessage[i + 3];
-        maxbytes = sumTimePerMessage[i + 6];
+        maxseconds = sumTimePerMessage[i + 2];
+        maxbytes = sumTimePerMessage[i + 4];
         result.pushKV(messageNames[j], std::to_string(sumTimePerMessage[i]) + " msgs => (" +
-          "[" + std::to_string(minseconds) + ", " + std::to_string(seconds) + ", " + std::to_string(maxseconds) + "] clocks" +
-          ", [" + std::to_string(minbytes) + ", " + std::to_string(bytes) + ", " + std::to_string(maxbytes) + "] bytes");
+          "[" + std::to_string(seconds) + ", " + std::to_string(maxseconds) + "] clocks" +
+          ", [" + std::to_string(bytes) + ", " + std::to_string(maxbytes) + "] bytes");
     }
     return result;
 }

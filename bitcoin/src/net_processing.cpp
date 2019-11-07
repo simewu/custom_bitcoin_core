@@ -3019,54 +3019,45 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
   // Cybersecurity Lab: Tracking all message times
   int commandIndex = -1;
   if(strCommand == NetMsgType::VERSION) commandIndex = 0;
-  else if(strCommand == NetMsgType::VERACK) commandIndex = 7;
-  else if(strCommand == NetMsgType::ADDR) commandIndex = 14;
-  else if(strCommand == NetMsgType::INV) commandIndex = 21;
-  else if(strCommand == NetMsgType::GETDATA) commandIndex = 28;
-  else if(strCommand == NetMsgType::MERKLEBLOCK) commandIndex = 35;
-  else if(strCommand == NetMsgType::GETBLOCKS) commandIndex = 42;
-  else if(strCommand == NetMsgType::GETHEADERS) commandIndex = 49;
-  else if(strCommand == NetMsgType::TX) commandIndex = 56;
-  else if(strCommand == NetMsgType::HEADERS) commandIndex = 63;
-  else if(strCommand == NetMsgType::BLOCK) commandIndex = 70;
-  else if(strCommand == NetMsgType::GETADDR) commandIndex = 77;
-  else if(strCommand == NetMsgType::MEMPOOL) commandIndex = 84;
-  else if(strCommand == NetMsgType::PING) commandIndex = 91;
-  else if(strCommand == NetMsgType::PONG) commandIndex = 98;
-  else if(strCommand == NetMsgType::NOTFOUND) commandIndex = 105;
-  else if (strCommand == NetMsgType::FILTERLOAD) commandIndex = 112;
-  else if(strCommand == NetMsgType::FILTERADD) commandIndex = 119;
-  else if(strCommand == NetMsgType::FILTERCLEAR) commandIndex = 126;
-  else if(strCommand == NetMsgType::SENDHEADERS) commandIndex = 133;
-  else if(strCommand == NetMsgType::FEEFILTER) commandIndex = 140;
-  else if(strCommand == NetMsgType::SENDCMPCT) commandIndex = 147;
-  else if(strCommand == NetMsgType::CMPCTBLOCK) commandIndex = 154;
-  else if(strCommand == NetMsgType::GETBLOCKTXN) commandIndex = 161;
-  else if(strCommand == NetMsgType::BLOCKTXN) commandIndex = 168;
-  else if(strCommand == NetMsgType::REJECT) commandIndex = 175;
+  else if(strCommand == NetMsgType::VERACK) commandIndex = 5;
+  else if(strCommand == NetMsgType::ADDR) commandIndex = 10;
+  else if(strCommand == NetMsgType::INV) commandIndex = 15;
+  else if(strCommand == NetMsgType::GETDATA) commandIndex = 20;
+  else if(strCommand == NetMsgType::MERKLEBLOCK) commandIndex = 25;
+  else if(strCommand == NetMsgType::GETBLOCKS) commandIndex = 30;
+  else if(strCommand == NetMsgType::GETHEADERS) commandIndex = 35;
+  else if(strCommand == NetMsgType::TX) commandIndex = 40;
+  else if(strCommand == NetMsgType::HEADERS) commandIndex = 45;
+  else if(strCommand == NetMsgType::BLOCK) commandIndex = 50;
+  else if(strCommand == NetMsgType::GETADDR) commandIndex = 55;
+  else if(strCommand == NetMsgType::MEMPOOL) commandIndex = 60;
+  else if(strCommand == NetMsgType::PING) commandIndex = 65;
+  else if(strCommand == NetMsgType::PONG) commandIndex = 70;
+  else if(strCommand == NetMsgType::NOTFOUND) commandIndex = 75;
+  else if (strCommand == NetMsgType::FILTERLOAD) commandIndex = 80;
+  else if(strCommand == NetMsgType::FILTERADD) commandIndex = 85;
+  else if(strCommand == NetMsgType::FILTERCLEAR) commandIndex = 90;
+  else if(strCommand == NetMsgType::SENDHEADERS) commandIndex = 95;
+  else if(strCommand == NetMsgType::FEEFILTER) commandIndex = 100;
+  else if(strCommand == NetMsgType::SENDCMPCT) commandIndex = 105;
+  else if(strCommand == NetMsgType::CMPCTBLOCK) commandIndex = 110;
+  else if(strCommand == NetMsgType::GETBLOCKTXN) commandIndex = 115;
+  else if(strCommand == NetMsgType::BLOCKTXN) commandIndex = 120;
+  else if(strCommand == NetMsgType::REJECT) commandIndex = 125;
 
   if(commandIndex != -1) {
     if(elapsed_time == -1) elapsed_time = 0; // So that the results dont reset from the value
     if(vRecvSize == -1) vRecvSize = 0;
-    
-    if(-1 == (pfrom->timePerMessage)[commandIndex]) (pfrom->timePerMessage)[commandIndex] = 0;
-    if(-1 == (pfrom->timePerMessage)[commandIndex + 1]) (pfrom->timePerMessage)[commandIndex + 1] = elapsed_time;
-    if(-1 == (pfrom->timePerMessage)[commandIndex + 2]) (pfrom->timePerMessage)[commandIndex + 2] = 0;
-    if(-1 == (pfrom->timePerMessage)[commandIndex + 3]) (pfrom->timePerMessage)[commandIndex + 3] = elapsed_time;
-    if(-1 == (pfrom->timePerMessage)[commandIndex + 4]) (pfrom->timePerMessage)[commandIndex + 4] = vRecvSize;
-    if(-1 == (pfrom->timePerMessage)[commandIndex + 5]) (pfrom->timePerMessage)[commandIndex + 5] = 0;
-    if(-1 == (pfrom->timePerMessage)[commandIndex + 6]) (pfrom->timePerMessage)[commandIndex + 6] = vRecvSize;
+
     (pfrom->timePerMessage)[commandIndex]++;
 
-    // Min, avg, max of elapsed time
-    if(elapsed_time < (pfrom->timePerMessage)[commandIndex + 1]) (pfrom->timePerMessage)[commandIndex + 1] = elapsed_time;
-    (pfrom->timePerMessage)[commandIndex + 2] += elapsed_time;
-    if(elapsed_time > (pfrom->timePerMessage)[commandIndex + 3]) (pfrom->timePerMessage)[commandIndex + 3] = elapsed_time;
+    // Avg, max of elapsed time
+    (pfrom->timePerMessage)[commandIndex + 1] += elapsed_time;
+    if(elapsed_time > (pfrom->timePerMessage)[commandIndex + 2]) (pfrom->timePerMessage)[commandIndex + 2] = elapsed_time;
 
-    // Min, avg, max of number of bytes
-    if(vRecvSize < (pfrom->timePerMessage)[commandIndex + 4]) (pfrom->timePerMessage)[commandIndex + 4] = vRecvSize;
-    (pfrom->timePerMessage)[commandIndex + 5] += vRecvSize;
-    if(vRecvSize > (pfrom->timePerMessage)[commandIndex + 6]) (pfrom->timePerMessage)[commandIndex + 6] = vRecvSize;
+    // Avg, max of number of bytes
+    (pfrom->timePerMessage)[commandIndex + 3] += vRecvSize;
+    if(vRecvSize > (pfrom->timePerMessage)[commandIndex + 4]) (pfrom->timePerMessage)[commandIndex + 4] = vRecvSize;
   } else {
     LogPrintf("\n***************************************** Undocumented research message ... ? : ");
   }
