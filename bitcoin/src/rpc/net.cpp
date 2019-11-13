@@ -13,6 +13,8 @@
 #include <blockencodings.h> // Cybersecurity Lab
 #include <netmessagemaker.h> // Cybersecurity Lab
 #include <merkleblock.h> // Cybersecurity Lab
+#include <sstream> // Cybersecurity Lab
+#include <vector> // Cybersecurity Lab
 #include <netbase.h>
 #include <policy/policy.h>
 #include <rpc/protocol.h>
@@ -64,11 +66,37 @@ static UniValue sendCustomMessage(const JSONRPCRequest& request)
                 "\nSend a message.\n",
                 {
                   {"msg", RPCArg::Type::STR, RPCArg::Optional::NO, "Message type"},
-                  {"msgname", RPCArg::Type::STR, /* default */ "None", "Message name (if msg is the raw message data)"},
+                  {"args", RPCArg::Type::STR, /* default */ "None", "Arguments separated by ',')"},
                 },
                 RPCResults{},
                 RPCExamples{
-                    HelpExampleCli("send", "msg[, msgname]") + HelpExampleRpc("send", "msg[, msgname]")
+                    HelpExampleCli("send", "version") +
+                    HelpExampleCli("send", "verack") +
+                    HelpExampleCli("send", "addr") +
+                    HelpExampleCli("send", "inv") +
+                    HelpExampleCli("send", "getdata") +
+                    HelpExampleCli("send", "merkleblock") +
+                    HelpExampleCli("send", "getblocks") +
+                    HelpExampleCli("send", "getheaders") +
+                    HelpExampleCli("send", "tx") +
+                    HelpExampleCli("send", "headers") +
+                    HelpExampleCli("send", "block") +
+                    HelpExampleCli("send", "getaddr") +
+                    HelpExampleCli("send", "mempool") +
+                    HelpExampleCli("send", "ping") +
+                    HelpExampleCli("send", "pong") +
+                    HelpExampleCli("send", "notfound") +
+                    HelpExampleCli("send", "filterload") +
+                    HelpExampleCli("send", "filteradd") +
+                    HelpExampleCli("send", "filterclear") +
+                    HelpExampleCli("send", "sendheaders") +
+                    HelpExampleCli("send", "feefilter") +
+                    HelpExampleCli("send", "sendcmpct [true or false, Use CMPCT],[1 or 2, Protocol version]") +
+                    HelpExampleCli("send", "cmpctblock") +
+                    HelpExampleCli("send", "getblocktxn") +
+                    HelpExampleCli("send", "blocktxn") +
+                    HelpExampleCli("send", "reject") +
+                    HelpExampleCli("send", "[HEX CODE] [MESSAGE NAME]")
                 },
             }.ToString());
 
@@ -76,17 +104,24 @@ static UniValue sendCustomMessage(const JSONRPCRequest& request)
         throw JSONRPCError(RPC_CLIENT_P2P_DISABLED, "Error: Peer-to-peer functionality missing or disabled");
 
     std::string msg = request.params[0].get_str();
-    std::string msgname;
-
+    std::string rawArgs;
     try {
-      msgname = request.params[1].get_str();
+      rawArgs = request.params[1].get_str();
     } catch(const std::exception& e) {
-      msgname = "None";
+      rawArgs = "None";
     }
+
+    std::vector<std::string> args;
+    std::stringstream ss(rawArgs);
+    std::string item;
+    while (getline(ss, item, ',')) {
+        args.push_back(item);
+    }
+
     CSerializedNetMsg netMsg;
 
-
-    g_connman->ForEachNode([&msg, &msgname, &netMsg](CNode* pnode) {
+    std::string outputMessage = "";
+    g_connman->ForEachNode([&msg, &args, &netMsg, &outputMessage](CNode* pnode) {
         LOCK(pnode->cs_inventory);
 
         if (msg == "filterload") {
@@ -142,8 +177,27 @@ static UniValue sendCustomMessage(const JSONRPCRequest& request)
           g_connman->PushMessage(pnode, CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::SENDHEADERS));
 
         } else if(msg == "sendcmpct") {
-          netMsg = CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::SENDCMPCT);
-          g_connman->PushMessage(pnode, CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::SENDCMPCT));
+          bool fAnnounceUsingCMPCTBLOCK;
+          uint64_t nCMPCTBLOCKVersion;
+          if(args.size() >= 1 && args[0] == "true") {
+            fAnnounceUsingCMPCTBLOCK = true;
+            outputMessage += "Announce using CMPCT Block: true\n";
+          } else {
+            fAnnounceUsingCMPCTBLOCK = false;
+            outputMessage += "Announce using CMPCT Block: false\n";
+          }
+          if(args.size() >= 2 && args[1] == "1") {
+            nCMPCTBLOCKVersion = 1;
+            outputMessage += "CMPCT Version: 1";
+          } else {
+            nCMPCTBLOCKVersion = 2;
+            outputMessage += "CMPCT Version: 2";
+          }
+
+          netMsg = CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::SENDCMPCT, fAnnounceUsingCMPCTBLOCK, nCMPCTBLOCKVersion);
+          g_connman->PushMessage(pnode, CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::SENDCMPCT, fAnnounceUsingCMPCTBLOCK, nCMPCTBLOCKVersion));
+
+          outputMessage += "\n\n";
 
         } else if(msg == "inv") {
           std::vector<CInv> inv;
@@ -241,10 +295,10 @@ static UniValue sendCustomMessage(const JSONRPCRequest& request)
           netMsg = CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::MERKLEBLOCK);
           g_connman->PushMessage(pnode, CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::MERKLEBLOCK));
 
-        } else if(msgname != "None") {
+        } else if(args[0] != "None") {
           CDataStream message(ParseHex(msg), SER_NETWORK, PROTOCOL_VERSION);
-          netMsg = CNetMsgMaker(PROTOCOL_VERSION).Make(msgname, message);
-          g_connman->PushMessage(pnode, CNetMsgMaker(PROTOCOL_VERSION).Make(msgname, message));
+          netMsg = CNetMsgMaker(PROTOCOL_VERSION).Make(args[0], message);
+          g_connman->PushMessage(pnode, CNetMsgMaker(PROTOCOL_VERSION).Make(args[0], message));
         } else {
           throw JSONRPCError(RPC_CLIENT_P2P_DISABLED, "Please enter a valid message type.");
         }
@@ -267,7 +321,9 @@ static UniValue sendCustomMessage(const JSONRPCRequest& request)
       data.push_back("0123456789ABCDEF"[c1]);
       data.push_back(' ');
     }
-    return netMsg.command + " was sent:\n" + data;//NullUniValue;
+    std::stringstream output;
+    output << netMsg.command << " was sent:\n" << outputMessage << "\nRaw data: " << data;
+    return  output.str(); //NullUniValue;
 }
 
 /*
@@ -1072,7 +1128,7 @@ static UniValue getnodeaddresses(const JSONRPCRequest& request)
 static const CRPCCommand commands[] =
 { //  category              name                      actor (function)         argNames
   //  --------------------- ------------------------  -----------------------  ----------
-    { "DoS suite",          "send",                   &sendCustomMessage,      {"msg", "msgname"} },
+    { "DoS suite",          "send",                   &sendCustomMessage,      {"msg", "args"} },
     { "DoS suite",          "requestmempools",        &requestmempools,        {} },
     { "DoS suite",          "getaddr",                &getaddr,                {} },
     { "DoS suite",          "list",                   &list,                   {} },
