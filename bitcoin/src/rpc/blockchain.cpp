@@ -2397,8 +2397,8 @@ static UniValue getmsginfo(const JSONRPCRequest& request)
         maxseconds = sumTimePerMessage[i + 2];
         maxbytes = sumTimePerMessage[i + 4];
         result.pushKV(messageNames[j], std::to_string(sumTimePerMessage[i]) + " msgs => (" +
-          "[" + std::to_string(seconds) + ", " + std::to_string(maxseconds) + "] clocks" +
-          ", [" + std::to_string(bytes) + ", " + std::to_string(maxbytes) + "] bytes");
+          "[" + std::to_string(seconds) + ", " + std::to_string(maxseconds) + "] clcs" +
+          ", [" + std::to_string(bytes) + ", " + std::to_string(maxbytes) + "] byts");
     }
     return result;
 }
