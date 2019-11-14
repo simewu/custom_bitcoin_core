@@ -163,14 +163,22 @@ static UniValue sendCustomMessage(const JSONRPCRequest& request)
 
           netMsg = CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::VERSION, PROTOCOL_VERSION, (uint64_t)nLocalNodeServices, nTime, addrYou, addrMe, nonce, strSubVersion, nNodeStartingHeight, announceRelayTxes);
           g_connman->PushMessage(pnode, CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::VERSION));
+          //netMsg = CNetMsgMaker(70012).Make(NetMsgType::VERSION, PROTOCOL_VERSION, (uint64_t)nLocalNodeServices, nTime, addrYou, addrMe, nonce, strSubVersion, nNodeStartingHeight, announceRelayTxes);
+          //g_connman->PushMessage(pnode, CNetMsgMaker(70012).Make(NetMsgType::VERSION));
 
         } else if(msg == "verack") {
           netMsg = CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::VERACK);
           g_connman->PushMessage(pnode, CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::VERACK));
 
         } else if(msg == "addr") {
-          netMsg = CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::ADDR);
-          g_connman->PushMessage(pnode, CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::ADDR));
+          std::vector<CAddress> vAddr = g_connman->GetAddresses(); // Randomized vector of addresses
+          outputMessage += "Originally " + std::to_string(vAddr.size()) + " addresses.\n";
+          if(vAddr.size() > 1000) vAddr.resize(1000);
+          outputMessage += "Sending " + std::to_string(vAddr.size()) + " addresses.";
+
+          netMsg = CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::ADDR, vAddr);
+          g_connman->PushMessage(pnode, CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::ADDR, vAddr));
+          outputMessage += "\n\n";
 
         } else if(msg == "sendheaders") {
           netMsg = CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::SENDHEADERS);
