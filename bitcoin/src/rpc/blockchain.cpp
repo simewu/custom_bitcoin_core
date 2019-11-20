@@ -2388,17 +2388,19 @@ static UniValue getmsginfo(const JSONRPCRequest& request)
     });
     result.pushKV("CLOCKS PER SECOND", std::to_string(CLOCKS_PER_SEC));
     for(int i = 0, j = 0; i < 27 * 5; i += 5, j++) {
-        double seconds = 0, bytes = 0;
-        int maxseconds = 0, maxbytes = 0;
+        double avgseconds = 0, avgbytes = 0;
+        int sumseconds = 0, sumbytes = 0, maxseconds = 0, maxbytes = 0;
         if(sumTimePerMessage[i] != 0) { // If the number of messages is not zero (avoid divide by zero)
-          seconds = (double)sumTimePerMessage[i + 1] / (double)sumTimePerMessage[i];
-          bytes = (double)sumTimePerMessage[i + 3] / (double)sumTimePerMessage[i];
+          avgseconds = (double)sumTimePerMessage[i + 1] / (double)sumTimePerMessage[i];
+          avgbytes = (double)sumTimePerMessage[i + 3] / (double)sumTimePerMessage[i];
+          sumseconds = sumTimePerMessage[i + 1];
+          sumbytes = sumTimePerMessage[i + 3];
         }
         maxseconds = sumTimePerMessage[i + 2];
         maxbytes = sumTimePerMessage[i + 4];
         result.pushKV(messageNames[j], std::to_string(sumTimePerMessage[i]) + " msgs => (" +
-          "[" + std::to_string(seconds) + ", " + std::to_string(maxseconds) + "] clcs" +
-          ", [" + std::to_string(bytes) + ", " + std::to_string(maxbytes) + "] byts");
+          "[" + std::to_string(sumseconds) + ", " + std::to_string(avgseconds) + ", " + std::to_string(maxseconds) + "] clcs" +
+          ", [" + std::to_string(sumbytes) + ", " + std::to_string(avgbytes) + ", " + std::to_string(maxbytes) + "] byts");
     }
     return result;
 }
