@@ -6,10 +6,12 @@ import re
 datadir = '/media/sim/BITCOIN/' # Virtual machine shared folder
 if os.path.exists('/media/sf_Bitcoin'):
 	datadir = '/media/sf_Bitcoin' # Virtual machine shared folder
+elif os.path.exists('../blocks'):
+	datadir = '..' # Super computer shared folder
 
 def bitcoin(cmd):
 	#return os.popen('\'C:\\Program Files\\Bitcoin\\daemon\\bitcoin-cli\' -rpcuser=simewu -rpcpassword=kZIdeN4HjZ3fp9Lge4iezt0eJrbjSi8kuSuOHeUkEUbQVdf09JZXAAGwF3R5R2qQkPgoLloW91yTFuufo7CYxM2VPT7A5lYeTrodcLWWzMMwIrOKu7ZNiwkrKOQ95KGW8kIuL1slRVFXoFpGsXXTIA55V3iUYLckn8rj8MZHBpmdGQjLxakotkj83ZlSRx1aOJ4BFxdvDNz0WHk1i2OPgXL4nsd56Ph991eKNbXVJHtzqCXUbtDELVf4shFJXame -rpcport=8332 ' + cmd).read()
-	return os.popen(f'~/Desktop/custom_bitcoin_core/bitcoin/src/bitcoin-cli -datadir={datadir} {cmd}').read()
+	return os.popen(f'bitcoin/src/bitcoin-cli -datadir={datadir} {cmd}').read()
 
 
 def console(width):
