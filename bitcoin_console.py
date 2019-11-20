@@ -37,7 +37,8 @@ def console(width):
 			cmd = commands[cmd]
 			print('    >   ' + cmd)
 		elif cmd.endswith('*'): # Infinite loop
-			cmd = str(cmd)
+			cmd = str(cmd[:-1])
+			print(cmd)
 			while True:
 				bitcoin(cmd)
 			return
