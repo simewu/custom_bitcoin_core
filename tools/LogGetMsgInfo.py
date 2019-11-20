@@ -152,6 +152,11 @@ def fetchHeader():
 	line += "REJECTClksMax,"
 	line += "REJECTBytsAvg,"
 	line += "REJECTBytsMax,"
+	line += "# [UNDOCUMENTED],"
+	line += "[UNDOCUMENTED]ClksAvg,"
+	line += "[UNDOCUMENTED]ClksMax,"
+	line += "[UNDOCUMENTED]BytsAvg,"
+	line += "[UNDOCUMENTED]BytsMax,"
 	return line
 
 def parseMessage(string):
@@ -235,6 +240,7 @@ def fetch():
 	line += parseMessage(messages["GETBLOCKTXN"]) + ","
 	line += parseMessage(messages["BLOCKTXN"]) + ","
 	line += parseMessage(messages["REJECT"]) + ","
+	line += parseMessage(messages["[UNDOCUMENTED]"]) + ","
 	return line
 
 def log(file, targetDateTime, count = 1):
@@ -252,7 +258,7 @@ def log(file, targetDateTime, count = 1):
 def getDelay(time):
 	return (time - datetime.datetime.now()).total_seconds()
 
-time = input("Enter what time it should begin (example: \"3:33pm\", \"\" for right now): ")
+time = input("Enter what time it should begin (example: \"2:45pm\", \"\" for right now): ")
 file = open(os.path.expanduser("~/Desktop/GetMsgInfoLog.csv"), "w+")
 
 if time == "":

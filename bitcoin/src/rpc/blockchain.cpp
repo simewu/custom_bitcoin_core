@@ -2374,20 +2374,20 @@ static UniValue getmsginfo(const JSONRPCRequest& request)
                 },
             }.ToString());
 
-    std::vector<std::string> messageNames{"VERSION", "VERACK", "ADDR", "INV", "GETDATA", "MERKLEBLOCK", "GETBLOCKS", "GETHEADERS", "TX", "HEADERS", "BLOCK", "GETADDR", "MEMPOOL", "PING", "PONG", "NOTFOUND", "FILTERLOAD", "FILTERADD", "FILTERCLEAR", "SENDHEADERS", "FEEFILTER", "SENDCMPCT", "CMPCTBLOCK", "GETBLOCKTXN", "BLOCKTXN", "REJECT"};
+    std::vector<std::string> messageNames{"VERSION", "VERACK", "ADDR", "INV", "GETDATA", "MERKLEBLOCK", "GETBLOCKS", "GETHEADERS", "TX", "HEADERS", "BLOCK", "GETADDR", "MEMPOOL", "PING", "PONG", "NOTFOUND", "FILTERLOAD", "FILTERADD", "FILTERCLEAR", "SENDHEADERS", "FEEFILTER", "SENDCMPCT", "CMPCTBLOCK", "GETBLOCKTXN", "BLOCKTXN", "REJECT", "[UNDOCUMENTED]"};
 
-    std::vector<int> sumTimePerMessage(26 * 5); // Alternating variables
-    std::vector<int> maxTimePerMessage(26 * 5); // Alternating variables
+    std::vector<int> sumTimePerMessage(27 * 5); // Alternating variables
+    std::vector<int> maxTimePerMessage(27 * 5); // Alternating variables
     UniValue result(UniValue::VOBJ);
 
     g_connman->ForEachNode([&result, &sumTimePerMessage, &maxTimePerMessage](CNode* pnode) {
-        for(int i = 0; i < 26 * 5; i++) {
+        for(int i = 0; i < 27 * 5; i++) {
           sumTimePerMessage[i] += (pnode->timePerMessage)[i];
           if((pnode->timePerMessage)[i] > maxTimePerMessage[i]) maxTimePerMessage[i] = (pnode->timePerMessage)[i];
         }
     });
     result.pushKV("CLOCKS PER SECOND", std::to_string(CLOCKS_PER_SEC));
-    for(int i = 0, j = 0; i < 26 * 5; i += 5, j++) {
+    for(int i = 0, j = 0; i < 27 * 5; i += 5, j++) {
         double seconds = 0, bytes = 0;
         int maxseconds = 0, maxbytes = 0;
         if(sumTimePerMessage[i] != 0) { // If the number of messages is not zero (avoid divide by zero)

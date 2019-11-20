@@ -3044,23 +3044,21 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
   else if(strCommand == NetMsgType::GETBLOCKTXN) commandIndex = 115;
   else if(strCommand == NetMsgType::BLOCKTXN) commandIndex = 120;
   else if(strCommand == NetMsgType::REJECT) commandIndex = 125;
+  else commandIndex = 130;
 
-  if(commandIndex != -1) {
-    if(elapsed_time == -1) elapsed_time = 0; // So that the results dont reset from the value
-    if(vRecvSize == -1) vRecvSize = 0;
+  if(elapsed_time == -1) elapsed_time = 0; // So that the results dont reset from the value
+  if(vRecvSize == -1) vRecvSize = 0;
 
-    (pfrom->timePerMessage)[commandIndex]++;
+  (pfrom->timePerMessage)[commandIndex]++;
 
-    // Avg, max of elapsed time
-    (pfrom->timePerMessage)[commandIndex + 1] += elapsed_time;
-    if(elapsed_time > (pfrom->timePerMessage)[commandIndex + 2]) (pfrom->timePerMessage)[commandIndex + 2] = elapsed_time;
+  // Avg, max of elapsed time
+  (pfrom->timePerMessage)[commandIndex + 1] += elapsed_time;
+  if(elapsed_time > (pfrom->timePerMessage)[commandIndex + 2]) (pfrom->timePerMessage)[commandIndex + 2] = elapsed_time;
 
-    // Avg, max of number of bytes
-    (pfrom->timePerMessage)[commandIndex + 3] += vRecvSize;
-    if(vRecvSize > (pfrom->timePerMessage)[commandIndex + 4]) (pfrom->timePerMessage)[commandIndex + 4] = vRecvSize;
-  } else {
-    LogPrintf("\n***************************************** Undocumented research message ... ? : ");
-  }
+  // Avg, max of number of bytes
+  (pfrom->timePerMessage)[commandIndex + 3] += vRecvSize;
+  if(vRecvSize > (pfrom->timePerMessage)[commandIndex + 4]) (pfrom->timePerMessage)[commandIndex + 4] = vRecvSize;
+
   LogPrintf("\n*** Message *** id=%d addr=%s *** cmd=%s *** cycles=%f *** bytes=%f", pfrom->GetId(), pfrom->addr.ToString(), strCommand, elapsed_time, vRecvSize); // Cybersecurity Lab
   return result;
 }

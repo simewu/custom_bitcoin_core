@@ -727,7 +727,7 @@ public:
     std::atomic<int64_t> timeLastMempoolReq{0};
 
     // Cybersecurity Lab: Used to track node data, initialize all to -1
-    std::vector<int> timePerMessage{std::vector<int>(26 * 5)}; // Alternating variables
+    std::vector<int> timePerMessage{std::vector<int>(27 * 5)}; // Alternating variables
 
     // Block and TXN accept times
     std::atomic<int64_t> nLastBlockTime{0};
