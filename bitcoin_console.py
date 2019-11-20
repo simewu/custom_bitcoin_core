@@ -37,13 +37,11 @@ def console(width):
 			cmd = commands[cmd]
 			print('    >   ' + cmd)
 		elif cmd.endswith('*'): # Infinite loop
-			print(cmd)
 			cmd = str(cmd)
 			while True:
 				bitcoin(cmd)
 			return
 		else:
-			print(cmd)
 			cmd = str(cmd)
 			commands[count] = cmd
 			count += 1
@@ -51,7 +49,7 @@ def console(width):
 
 		for i in range(numTimes - 1):
 			bitcoin(cmd)
-		print('   ' + bitcoin(cmd))
+		print(bitcoin(cmd))
 		print('-' * width)
 
 console(80)

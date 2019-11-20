@@ -312,13 +312,21 @@ def parseMessage(message, string):
 
 	clocksSumDiff = int(match1[0])
 	clocksAvgDiff = clocksSumDiff
-	if numMsgsDiff != 0 and message in prevClocksSum:
-		clocksAvgDiff = (int(clocksSumDiff) - int(prevClocksSum[message])) / numMsgsDiff
+	if message in prevClocksSum:
+		clocksSumDiff = int(match1[0]) - int(prevClocksSum[message])
+		if numMsgsDiff != 0:
+			clocksAvgDiff = clocksSumDiff / numMsgsDiff
+		else:
+			clocksAvgDiff = 0
 
 	bytesSumDiff = int(match2[0])
 	bytesAvgDiff = bytesSumDiff
-	if numMsgsDiff != 0 and message in prevBytesSum:
-		bytesAvgDiff = (int(bytesSumDiff) - int(prevBytesSum[message])) / numMsgsDiff
+	if message in prevBytesSum:
+		bytesSumDiff = int(match2[0]) - int(prevBytesSum[message])
+		if numMsgsDiff != 0:
+			bytesAvgDiff = bytesSumDiff / numMsgsDiff
+		else:
+			bytesAvgDiff = 0
 
 	line += str(numMsgs) + ','		# Num
 	line += str(numMsgsDiff) + ','	# Num Diff
@@ -336,9 +344,9 @@ def parseMessage(message, string):
 	line += str(match2[1]) + ','	# BytsAvg
 	line += str(match2[2])			# BytsMax
 
+	"""
 	line += "# VERSION,"
 	line += "# VERSION Diff,"
-
 	line += "VERSION ClksSum Diff,"
 	line += "VERSION ClksAvg Diff,"
 	line += "VERSION ClksAvg,"
@@ -346,11 +354,11 @@ def parseMessage(message, string):
 	line += "VERSION BytsSum Diff,"
 	line += "VERSION BytsAvg Diff,"
 	line += "VERSION BytsAvg,"
-	line += "VERSION BytsMax,"
+	line += "VERSION BytsMax,"""
 
 	prevNumMsgs[message] = numMsgs
-	prevClocksSum[message] = clocksSumDiff
-	prevBytesSum[message] = bytesSumDiff
+	prevClocksSum[message] = match1[0]
+	prevBytesSum[message] = match2[0]
 	return line
 
 
