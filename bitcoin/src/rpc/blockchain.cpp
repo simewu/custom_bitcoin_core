@@ -2381,7 +2381,7 @@ static UniValue getmsginfo(const JSONRPCRequest& request)
     UniValue result(UniValue::VOBJ);
 
     g_connman->ForEachNode([&result, &sumTimePerMessage, &maxTimePerMessage](CNode* pnode) {
-        for(int i = 0; i < 78; i++) {
+        for(int i = 0; i < 26 * 5; i++) {
           sumTimePerMessage[i] += (pnode->timePerMessage)[i];
           if((pnode->timePerMessage)[i] > maxTimePerMessage[i]) maxTimePerMessage[i] = (pnode->timePerMessage)[i];
         }
