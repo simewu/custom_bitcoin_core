@@ -36,7 +36,14 @@ def console(width):
 		if(cmd in commands):
 			cmd = commands[cmd]
 			print('    >   ' + cmd)
+		elif cmd.endswith('*'): # Infinite loop
+			print(cmd)
+			cmd = str(cmd)
+			while True:
+				bitcoin(cmd)
+			return
 		else:
+			print(cmd)
 			cmd = str(cmd)
 			commands[count] = cmd
 			count += 1
