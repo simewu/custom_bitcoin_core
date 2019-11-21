@@ -296,7 +296,7 @@ prevBytesSum = {}
 def parseMessage(message, string):
 	line = ''
 	numMsgs = re.findall(r'([0-9\.]+) msgs', string)[0]
-	matches = re.findall(r'\[[0-9\., ]+\]', string)
+	matches = re.findall(r'\[\-?[0-9\., ]+\]', string)
 	if len(matches) != 2:
 		return None
 	match1 = json.loads(matches[0])
