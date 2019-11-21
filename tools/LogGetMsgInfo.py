@@ -343,8 +343,7 @@ def parseMessage(message, string):
 	return line
 
 
-def fetch():
-	now = datetime.datetime.now()
+def fetch(now):
 	messages = json.loads(bitcoin('getmsginfo'))
 
 	line = str(now) + ','
@@ -382,8 +381,9 @@ def fetch():
 
 def log(file, targetDateTime, count = 1):
 	try:
-		file.write(fetch() + '\n')
-		print('Line ' + str(count))
+		now = datetime.datetime.now()
+		print(f'Line {str(count)} off by {(now - targetDateTime).total_seconds()} seconds.')
+		file.write(fetch(now) + '\n')
 		file.flush()
 		#if count >= 3600:
 		#	file.close()
@@ -418,12 +418,13 @@ def main():
 		targetDateTime = datetime.datetime.strptime(datetime.datetime.now().strftime('%d-%m-%Y') + ' ' + time, '%d-%m-%Y %I:%M%p')
 		delay = getDelay(targetDateTime)
 
+	if(delay > 60):
+		print('Time left: ' + str(delay / 60) + ' minutes.\n')
+	else:
+		print('Time left: ' + str(delay) + ' seconds.\n')
+
 	file.write(fetchHeader() + '\n')
 	Timer(delay, log, [file, targetDateTime, 1]).start()
 
-	if(delay > 60):
-		print('Time left: ' + str(delay / 60) + ' minutes.')
-	else:
-		print('Time left: ' + str(delay) + ' seconds.')
 
 main()
