@@ -1,10 +1,6 @@
 import os
-import json
-import time
-import re
-import os
 
-def cmd(cmd):
+def terminal(cmd):
 	return os.popen(cmd).read()
 
 def main():
@@ -18,8 +14,7 @@ def main():
 	count = 1
 	while True:
 		print(f'\nWriting to {path}/pcap_log_{count}')
-		command = f'sudo timeout {timeout}s tcpdump -w {path}/pcap_log_{count}'
-		cmd(command)
+		terminal(f'sudo timeout {timeout}s tcpdump -w {path}/pcap_log_{count}')
 		count += 1
 
 main()
