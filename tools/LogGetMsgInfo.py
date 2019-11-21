@@ -15,11 +15,6 @@ def bitcoin(cmd):
 def fetchHeader():
 	line = "Timestamp,"
 	line += "Timestamp (Seconds),"
-	line += "NumPeers,"
-	line += "InactivePeers,"
-	line += "AvgPingTime,"
-	line += "TotalBanScore,"
-	line += "Connections,"
 	line += "ClocksPerSec,"
 
 	line += "# VERSION,"
@@ -342,28 +337,6 @@ def parseMessage(message, string):
 	line += str(match2[1]) + ','	# BytesAvg
 	line += str(match2[2])			# BytesMax
 
-	"""
-	line = "Timestamp,"
-	line += "Timestamp (Seconds),"
-	line += "NumPeers,"
-	line += "InactivePeers,"
-	line += "AvgPingTime,"
-	line += "TotalBanScore,"
-	line += "Connections,"
-	line += "ClocksPerSec,"
-
-	line += "# VERSION,"
-	line += "# VERSION Diff,"
-	line += "VERSION ClocksSum Diff,"
-	line += "VERSION ClocksAvg Diff,"
-	line += "VERSION ClocksAvg,"
-	line += "VERSION ClocksMax,"
-	line += "VERSION BytesSum Diff,"
-	line += "VERSION BytesAvg Diff,"
-	line += "VERSION BytesAvg,"
-	line += "VERSION BytesMax,"
-	"""
-
 	prevNumMsgs[message] = numMsgs
 	prevClocksSum[message] = match1[0]
 	prevBytesSum[message] = match2[0]
@@ -373,39 +346,9 @@ def parseMessage(message, string):
 def fetch():
 	now = datetime.datetime.now()
 	messages = json.loads(bitcoin("getmsginfo"))
-	peerinfo = json.loads(bitcoin("getpeerinfo"))
-	numPeers = len(peerinfo)
-	addresses = ''
-	totalBanScore = 0
-	totalPingTime = 0
-	numPingTimes = 0
-	noResponsePings = 0
-	for peer in peerinfo:
-		if addresses != '':
-			addresses += ' '
-		try:
-			addresses += peer["addr"]
-			totalBanScore += peer["banscore"]
-		except:
-			pass
-		try:
-			totalPingTime += peer["pingtime"]
-			numPingTimes += 1
-		except:
-			noResponsePings += 1
 
-
-	if numPingTimes != 0:
-		avgPingTime = totalPingTime / numPingTimes
-	else:
-		avgPingTime = "N/A"
 	line = str(now) + ","
 	line += str((now - datetime.datetime(1970, 1, 1)).total_seconds()) + ","
-	line += str(numPeers) + ","
-	line += str(noResponsePings) + ","
-	line += str(avgPingTime) + ","
-	line += str(totalBanScore) + ","
-	line += addresses + ","
 
 	line += str(messages["CLOCKS PER SECOND"]) + ","
 	line += parseMessage("VERSION", messages["VERSION"]) + ","
