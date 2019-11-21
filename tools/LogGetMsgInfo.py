@@ -401,9 +401,9 @@ def getDelay(time):
 
 def main():
 	os.system('clear')
-	print('GETMSGINFO LOGGER'.center(84))
-	print('-' * 84)
-	description = input('Enter a description to append to the file name ("GetMsgInfoLog [DESCRIPTION].csv"): ')
+	print('GETMSGINFO LOGGER'.center(80))
+	print('-' * 80)
+	description = input('Enter a description for the file name ("GetMsgInfoLog [DESCRIPTION].csv"): ')
 	filename = 'GetMsgInfoLog.csv'
 	if description != '':
 		filename = f'GetMsgInfoLog {description}.csv'
