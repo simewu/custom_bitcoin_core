@@ -389,8 +389,8 @@ def log(file, targetDateTime, count = 1):
 		#	file.close()
 		#	return
 		count += 1
-	except:
-		print('\nLOGGER PAUSED. Start the Bitcoin node when you are ready.')
+	except json.decoder.JSONDecodeError:
+		print(f'\nLOGGER PAUSED AT LINE {count}. Start the Bitcoin node when you are ready.')
 		pass
 	targetDateTime = targetDateTime + datetime.timedelta(seconds = numSecondsPerSample)
 	delay = getDelay(targetDateTime)
@@ -401,6 +401,8 @@ def getDelay(time):
 
 def main():
 	os.system('clear')
+	print('GETMSGINFO LOGGER'.center(84))
+	print('-' * 84)
 	description = input('Enter a description to append to the file name ("GetMsgInfoLog [DESCRIPTION].csv"): ')
 	filename = 'GetMsgInfoLog.csv'
 	if description != '':
