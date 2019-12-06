@@ -259,22 +259,43 @@ static UniValue sendCustomMessage(const JSONRPCRequest& request)
           g_connman->PushMessage(pnode, CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::BLOCKTXN));
 
         } else if(msg == "headers") {
-          netMsg = CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::HEADERS);
-          g_connman->PushMessage(pnode, CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::HEADERS));
+          std::vector<CBlock> vHeaders;
+          for(int i = 0; i < 2000; i++) {
+                uint64_t nonce = 0;
+                while (nonce == 0) {
+                    GetRandBytes((unsigned char*)&nonce, sizeof(nonce));
+                }
+
+              CBlockHeader block;
+              block.nVersion       = 0x20400000;
+              block.hashPrevBlock  = GetRandHash();
+              block.hashMerkleRoot = GetRandHash();
+              block.nTime          = GetAdjustedTime();
+              block.nBits          = 0;
+              block.nNonce         = nonce;
+              vHeaders.push_back(block);
+          }
+          netMsg = CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::HEADERS, vHeaders);
+          g_connman->PushMessage(pnode, CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::HEADERS, vHeaders));
 
         } else if(msg == "block") {
-          std::shared_ptr<const CBlock> block;
-          /*
+          //std::shared_ptr<const CBlock> block;
+
+            uint64_t nonce = 0;
+            while (nonce == 0) {
+                GetRandBytes((unsigned char*)&nonce, sizeof(nonce));
+            }
+
           CBlockHeader block;
-          block.nVersion       = nVersion;
-          block.hashPrevBlock  = hashPrevBlock;
-          block.hashMerkleRoot = hashMerkleRoot;
-          block.nTime          = nTime;
-          block.nBits          = nBits;
-          block.nNonce         = nNonce;
-          */
-          netMsg = CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::BLOCK, *block);
-          g_connman->PushMessage(pnode, CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::BLOCK, *block));
+          block.nVersion       = 0x20400000;
+          block.hashPrevBlock  = GetRandHash();
+          block.hashMerkleRoot = GetRandHash();
+          block.nTime          = GetAdjustedTime();
+          block.nBits          = 0;
+          block.nNonce         = nonce;
+
+          netMsg = CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::BLOCK, block);
+          g_connman->PushMessage(pnode, CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::BLOCK, block));
 
         } else if(msg == "getaddr") {
           netMsg = CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::GETADDR);
