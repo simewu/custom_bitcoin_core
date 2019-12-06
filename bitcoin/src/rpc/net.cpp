@@ -263,7 +263,7 @@ static UniValue sendCustomMessage(const JSONRPCRequest& request)
           g_connman->PushMessage(pnode, CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::HEADERS));
 
         } else if(msg == "block") {
-          std::shared_ptr<const CBlock> pblock;
+          std::shared_ptr<const CBlock> block;
           /*
           CBlockHeader block;
           block.nVersion       = nVersion;
