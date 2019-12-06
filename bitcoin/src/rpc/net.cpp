@@ -263,6 +263,7 @@ static UniValue sendCustomMessage(const JSONRPCRequest& request)
           g_connman->PushMessage(pnode, CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::HEADERS));
 
         } else if(msg == "block") {
+          
           netMsg = CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::BLOCK);
           g_connman->PushMessage(pnode, CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::BLOCK));
 
