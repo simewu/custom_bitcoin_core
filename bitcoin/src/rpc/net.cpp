@@ -263,9 +263,18 @@ static UniValue sendCustomMessage(const JSONRPCRequest& request)
           g_connman->PushMessage(pnode, CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::HEADERS));
 
         } else if(msg == "block") {
-          
-          netMsg = CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::BLOCK);
-          g_connman->PushMessage(pnode, CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::BLOCK));
+          std::shared_ptr<const CBlock> pblock;
+          /*
+          CBlockHeader block;
+          block.nVersion       = nVersion;
+          block.hashPrevBlock  = hashPrevBlock;
+          block.hashMerkleRoot = hashMerkleRoot;
+          block.nTime          = nTime;
+          block.nBits          = nBits;
+          block.nNonce         = nNonce;
+          */
+          netMsg = CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::BLOCK, *block);
+          g_connman->PushMessage(pnode, CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::BLOCK, *block));
 
         } else if(msg == "getaddr") {
           netMsg = CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::GETADDR);
