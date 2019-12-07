@@ -1,5 +1,9 @@
 #gnome-terminal -e ./use.sh -t "Custom Bitcoin Console"
 gnome-terminal -t "Custom Bitcoin Console" -- python3 bitcoin_console.py
+if [ ! -d "bitcoin/src" ]
+then
+    cd ..
+fi
 
 if [ -d "/media/sf_Bitcoin" ]
 then
