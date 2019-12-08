@@ -543,6 +543,10 @@ def init():
 	while len(glob.glob(os.path.expanduser(f'~/Desktop/Logs_GetMsgInfo_AlternatingConnections/Sample {fileSampleNumber + 1} *'))) > 0:
 		fileSampleNumber += 1
 
+	filesList = '\n'.join(glob.glob(os.path.expanduser('~/Desktop/Logs_GetMsgInfo_AlternatingConnections/Sample *')))
+	filesList = filesList.replace(os.path.expanduser('~/Desktop/Logs_GetMsgInfo_AlternatingConnections/'), '')
+	print(filesList)
+	print()
 	maxConnections = int(input(f'Starting at file "Sample {fileSampleNumber + 1} numConnections X.csv"\nHow many connections should be made? (From 1 to 8): '))
 	print()
 	path = os.path.expanduser('~/Desktop/Logs_GetMsgInfo_AlternatingConnections')
