@@ -4,11 +4,11 @@ import json
 import time
 import datetime
 import subprocess
+import glob
 from threading import Timer
 
 
-
-startupDelay = 0 # Number of seconds to wait after each node start up
+startupDelay = 0			# Number of seconds to wait after each node start up
 numSecondsPerSample = 1
 rowsPerNodeReset = 3000
 
@@ -457,7 +457,8 @@ def fetch(now):
 	line += parseMessage("[UNDOCUMENTED]", messages["[UNDOCUMENTED]"]) + ","
 	return line
 
-def resetNode(file, numConnections, fileNum):
+def resetNode(file, numConnections):
+	global fileSampleNumber
 	success = False
 	while not success:
 		try:
@@ -467,12 +468,14 @@ def resetNode(file, numConnections, fileNum):
 		except:
 			time.sleep(1)
 	time.sleep(10)
+
+	fileSampleNumber += 1
 	try:
 		file.close()
 	except:
 		pass
 	try:
-		file = open(os.path.expanduser(f'~/Desktop/Logs_GetMsgInfo_AlternatingConnections/Sample {fileNum + 1} numConnections {numConnections}.csv'), "w+")
+		file = open(os.path.expanduser(f'~/Desktop/Logs_GetMsgInfo_AlternatingConnections/Sample {fileSampleNumber} numConnections {numConnections}.csv'), "w+")
 		file.write(fetchHeader() + "\n")
 	except:
 		print('ERROR: Failed to create new file.')
@@ -502,9 +505,10 @@ def resetNode(file, numConnections, fileNum):
 	return file
 
 def log(file, targetDateTime, count, maxConnections):
+	global fileSampleNumber
 	try:
 		now = datetime.datetime.now()
-		print(f'Line: {str(count)}, File: {str(int((count - 1) / rowsPerNodeReset) + 1)}, Max Connections: {maxConnections}, Off by {(now - targetDateTime).total_seconds()} seconds.')
+		print(f'Line: {str(count)}, File: {fileSampleNumber}, Max Connections: {maxConnections}, Off by {(now - targetDateTime).total_seconds()} seconds.')
 		file.write(fetch(now) + "\n")
 		file.flush()
 		#if count >= 3600:
@@ -512,9 +516,8 @@ def log(file, targetDateTime, count, maxConnections):
 		#	return
 		if(count % rowsPerNodeReset == 0):
 			maxConnections = 1 + maxConnections % 8 # Bound the max connections to 8 peers
-			fileNum = int(count / rowsPerNodeReset)
 			try:
-				file = resetNode(file, maxConnections, fileNum)
+				file = resetNode(file, maxConnections)
 			except Exception as e:
 				print('ERROR: ' + e)
 
@@ -534,12 +537,19 @@ def getDelay(time):
 	return (time - datetime.datetime.now()).total_seconds()
 
 def init():
+	global fileSampleNumber
+	global maxConnections
+	fileSampleNumber = 0		# File number to start at
+	while len(glob.glob(os.path.expanduser(f'~/Desktop/Logs_GetMsgInfo_AlternatingConnections/Sample {fileSampleNumber + 1} *'))) > 0:
+		fileSampleNumber += 1
+
+	maxConnections = input(f'Starting at file "Sample {fileSampleNumber + 1} numConnections X.csv"\nHow many connections should be made? (From 1 to 8): ')
+	print()
 	path = os.path.expanduser('~/Desktop/Logs_GetMsgInfo_AlternatingConnections')
 	if not os.path.exists(path):
 	    os.makedirs(path)
 
-	maxConnections = 1
-	file = resetNode(None, maxConnections, 0)#open(os.path.expanduser(f'~/Desktop/Logs_GetMsgInfo_AlternatingConnections/sample0.csv'), "w+")
+	file = resetNode(None, maxConnections)#open(os.path.expanduser(f'~/Desktop/Logs_GetMsgInfo_AlternatingConnections/sample0.csv'), "w+")
 	targetDateTime = datetime.datetime.now()
 	log(file, targetDateTime, 1, maxConnections)
 
