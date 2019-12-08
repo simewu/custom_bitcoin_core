@@ -461,12 +461,12 @@ def resetNode(file, numConnections, fileNum):
 	success = False
 	while not success:
 		try:
-			print('Attempting to stop Bitcoin...')
+			print('Attempting to stop Bitcoin, then wait 10 seconds...')
 			bitcoin('stop')
 			success = True
 		except:
 			time.sleep(1)
-	time.sleep(5)
+	time.sleep(10)
 	try:
 		file.close()
 	except:
