@@ -10,7 +10,7 @@ from threading import Timer
 
 startupDelay = 0			# Number of seconds to wait after each node start up
 numSecondsPerSample = 1
-rowsPerNodeReset = 3000
+rowsPerNodeReset = 5
 
 os.system('clear')
 datadir = '/media/sim/BITCOIN' # Virtual machine shared folder
@@ -27,8 +27,18 @@ def bitcoin(cmd):
 	return os.popen("./../bitcoin/src/bitcoin-cli -rpcuser=cybersec -rpcpassword=kZIdeN4HjZ3fp9Lge4iezt0eJrbjSi8kuSuOHeUkEUbQVdf09JZXAAGwF3R5R2qQkPgoLloW91yTFuufo7CYxM2VPT7A5lYeTrodcLWWzMMwIrOKu7ZNiwkrKOQ95KGW8kIuL1slRVFXoFpGsXXTIA55V3iUYLckn8rj8MZHBpmdGQjLxakotkj83ZlSRx1aOJ4BFxdvDNz0WHk1i2OPgXL4nsd56Ph991eKNbXVJHtzqCXUbtDELVf4shFJXame -rpcport=8332 " + cmd).read()
 
 def startBitcoin():
-	subprocess.Popen(['gnome-terminal -t "Custom Bitcoin Console" -- .././run.sh'], shell=True)
+	subprocess.Popen(['gnome-terminal -t "Custom Bitcoin Core Instance" -- .././run.sh'], shell=True)
 
+def bitcoinUp():
+	return winexists('Custom Bitcoin Core Instance')
+
+def winexists(target):
+    for line in subprocess.check_output(['wmctrl', '-l']).splitlines():
+        window_name = line.split(None, 3)[-1].decode()
+        if window_name == target:
+            return True
+    return False
+    
 def fetchHeader():
 	line = "Timestamp,"
 	line += "Timestamp (Seconds),"
@@ -460,14 +470,14 @@ def fetch(now):
 def resetNode(file, numConnections):
 	global fileSampleNumber
 	success = False
-	while not success:
+	while not success or bitcoinUp():
 		try:
-			print('Attempting to stop Bitcoin, then wait 10 seconds...')
+			print('Stopping bitcoin...')
 			bitcoin('stop')
 			success = True
 		except:
-			time.sleep(1)
-	time.sleep(10)
+			pass
+		time.sleep(3)
 
 	fileSampleNumber += 1
 	try:
@@ -492,11 +502,13 @@ def resetNode(file, numConnections):
 	success = False
 	while not success:
 		try:
-			print('Attempting to start Bitcoin...')
+			print('Starting Bitcoin...')
 			startBitcoin()
 			success = True
 		except:
-			time.sleep(1)
+			pass
+
+		time.sleep(3)
 	if startupDelay > 0:
 		print(f'Startup delay for {startupDelay} seconds...')
 		time.sleep(startupDelay)
