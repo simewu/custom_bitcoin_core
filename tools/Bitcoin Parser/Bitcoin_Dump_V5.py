@@ -21,7 +21,6 @@ def dumpBlock(block):
 	blockSolverReward = 0
 
 	#transactionString = 'Number,Amount (Satoshi),Address,ID,Index,Hash,Input Size,Output Size,Uses Segwit,Uses BIP69,Uses Replace_by_Fee,Version,Size,Num. Inputs,Num. Outputs,Lock Time,Witnesses,is_multisig,is_p2sh,is_pubkey,is_pubkeyhash,is_return,is_unknown,type\n'
-	#transactionNum = 0
 	transactionSum = 0
 	transactionAverage = 0
 	transactionMinimum = float('inf')
@@ -73,7 +72,8 @@ def dumpBlock(block):
 			blockSolverReward += tx.outputs[0].value
 			blockSolver += txAddresses.rstrip()
 
-		'''transactionString += str(transactionNum) + ','
+		''' # Transaction processing using
+		transactionString += str(transactionNum) + ','
 		transactionString += str(tx.outputs[0].value) + ','
 		transactionString += str(tx.outputs[0].addresses) + ','
 		transactionString += str(tx.txid) + ','
