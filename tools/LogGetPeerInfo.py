@@ -97,7 +97,7 @@ def fetchHeader():
 	return line
 
 def fetch(now):
-
+	line = ''
 	messages = json.loads(bitcoin('getpeerinfo'))
 	for message in messages:
 		line += str(now) + ','
