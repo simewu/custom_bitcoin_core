@@ -210,10 +210,10 @@ def main():
 	os.system('clear')
 	print('GETMSGINFO LOGGER'.center(80))
 	print('-' * 80)
-	description = input('Enter a description for the file name ("GetMsgInfoLog [DESCRIPTION].csv"): ')
-	filename = 'GetMsgInfoLog.csv'
+	description = input('Enter a description for the file name ("GetPeerInfo [DESCRIPTION].csv"): ')
+	filename = 'GetPeerInfo.csv'
 	if description != '':
-		filename = f'GetMsgInfoLog {description}.csv'
+		filename = f'GetPeerInfo {description}.csv'
 
 	time = input('Enter what time it should begin (example: "2:45pm", "" for right now): ')
 	file = open(os.path.expanduser(f'~/Desktop/{filename}'), 'w+')
