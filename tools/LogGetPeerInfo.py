@@ -15,6 +15,7 @@ def bitcoin(cmd):
 def fetchHeader():
 	line = 'Timestamp,'
 	line += 'Timestamp (Seconds),'
+	line += 'Num Peers,'
 	line += 'ID,'
 	line += 'ADDR,'
 	line += 'ADDRLOCAL,'
@@ -102,6 +103,7 @@ def fetch(now):
 	for message in messages:
 		line += str(now) + ','
 		line += str((now - datetime.datetime(1970, 1, 1)).total_seconds()) + ','
+		line += str(len(messages)) + ','
 		line += str(message["id"] if "id" in message else "") + ','
 		line += str(message["addr"] if "addr" in message else "") + ','
 		line += str(message["addrlocal"] if "addrlocal" in message else "") + ','
