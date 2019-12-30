@@ -10,7 +10,7 @@ from threading import Timer
 
 startupDelay = 0			# Number of seconds to wait after each node start up
 numSecondsPerSample = 1
-rowsPerNodeReset = 5
+rowsPerNodeReset = 5		# Number of rows for cach numconnections file
 
 os.system('clear')
 datadir = '/media/sim/BITCOIN' # Virtual machine shared folder
@@ -38,7 +38,7 @@ def winexists(target):
         if window_name == target:
             return True
     return False
-    
+
 def fetchHeader():
 	line = "Timestamp,"
 	line += "Timestamp (Seconds),"
@@ -540,7 +540,7 @@ def log(file, targetDateTime, count, maxConnections):
 		print('\nLOGGER PAUSED. Hold on...')
 		print(e)
 
-	
+
 	targetDateTime = targetDateTime + datetime.timedelta(seconds = numSecondsPerSample)
 	delay = getDelay(targetDateTime)
 	Timer(delay, log, [file, targetDateTime, count, maxConnections]).start()
