@@ -190,7 +190,7 @@ def log(file, targetDateTime, count = 1):
 	try:
 		now = datetime.datetime.now()
 		print(f'Line {str(count)} off by {(now - targetDateTime).total_seconds()} seconds.')
-		file.write(fetch(now) + '\n')
+		file.write(fetch(now))
 		file.flush()
 		#if count >= 3600:
 		#	file.close()
