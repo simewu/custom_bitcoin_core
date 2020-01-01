@@ -12,6 +12,10 @@
 #include <chainparams.h>
 #include <consensus/validation.h>
 #include <ctime> // Cybersecurity Lab
+#include <univalue.h> // Cybersecurity Lab
+#include <rpc/server.h> // Cybersecurity Lab
+#include <rpc/protocol.h> // Cybersecurity Lab
+#include <rpc/util.h> // Cybersecurity Lab
 #include <hash.h>
 #include <validation.h>
 #include <merkleblock.h>
@@ -3930,3 +3934,70 @@ public:
         mapOrphanTransactionsByPrev.clear();
     }
 } instance_of_cnetprocessingcleanup;
+
+
+
+// Cybersecurity Lab
+static UniValue listcmpct(const JSONRPCRequest& request)
+{
+    if (request.fHelp || request.params.size() != 0)
+        throw std::runtime_error(
+            RPCHelpMan{"listcmpct",
+                "\nGet the sendcmpct status of each peer.\n",
+                {},
+                RPCResult{
+            "[\n*\n"
+                },
+                RPCExamples{
+                    HelpExampleCli("list", "")
+            + HelpExampleRpc("list", "")
+                },
+            }.ToString());
+
+    if(!g_connman)
+        throw JSONRPCError(RPC_CLIENT_P2P_DISABLED, "Error: Peer-to-peer functionality missing or disabled");
+
+    std::vector<CNodeStats> vstats;
+    g_connman->GetNodeStats(vstats);
+
+    //LOCK(cs_main);
+    UniValue result(UniValue::VOBJ);
+
+    g_connman->ForEachNode([&result](CNode* pnode) {
+        result.pushKV("IP", pnode->addr.ToString());
+        result.pushKV("fProvidesHeaderAndIDs", State(pnode->GetId())->fProvidesHeaderAndIDs);
+        result.pushKV("fWantsCmpctWitness", State(pnode->GetId())->fWantsCmpctWitness);
+        result.pushKV("fPreferHeaderAndIDs", State(pnode->GetId())->fPreferHeaderAndIDs);
+        result.pushKV("fSupportsDesiredCmpctVersion", State(pnode->GetId())->fSupportsDesiredCmpctVersion);
+    });
+
+    /*for (const CNodeStats& stats : vstats) {
+        CNodeStateStats statestats;
+        bool fStateStats = GetNodeStateStats(stats.nodeid, statestats);
+        if (fStateStats) {
+            result.pushKV("IP", stats.addrName);
+            result.pushKV("fProvidesHeaderAndIDs", statestats.fProvidesHeaderAndIDs);
+            result.pushKV("fWantsCmpctWitness", statestats.fWantsCmpctWitness);
+            result.pushKV("fPreferHeaderAndIDs", statestats.fPreferHeaderAndIDs);
+            result.pushKV("fSupportsDesiredCmpctVersion", statestats.fSupportsDesiredCmpctVersion);
+        }
+    }*/
+
+    return result;
+}
+
+// Cybersecurity Lab
+// clang-format off
+static const CRPCCommand commands[] =
+{ //  category              name                      actor (function)         argNames
+  //  --------------------- ------------------------  -----------------------  ----------
+  { "DoS suite",          "listcmpct",              &listcmpct,              {} },
+};
+// clang-format on
+
+// Cybersecurity Lab
+void RegisterBlockchainRPCCommands(CRPCTable &t)
+{
+    for (unsigned int vcidx = 0; vcidx < ARRAYLEN(commands); vcidx++)
+        t.appendCommand(commands[vcidx].name, &commands[vcidx]);
+}

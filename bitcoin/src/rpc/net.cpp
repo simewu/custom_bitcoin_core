@@ -473,46 +473,6 @@ static UniValue list(const JSONRPCRequest& request)
     return result;
 }
 
-// Cybersecurity Lab
-static UniValue listcmpct(const JSONRPCRequest& request)
-{
-    if (request.fHelp || request.params.size() != 0)
-        throw std::runtime_error(
-            RPCHelpMan{"listcmpct",
-                "\nGet the sendcmpct status of each peer.\n",
-                {},
-                RPCResult{
-            "[\n*\n"
-                },
-                RPCExamples{
-                    HelpExampleCli("list", "")
-            + HelpExampleRpc("list", "")
-                },
-            }.ToString());
-
-    if(!g_connman)
-        throw JSONRPCError(RPC_CLIENT_P2P_DISABLED, "Error: Peer-to-peer functionality missing or disabled");
-
-    std::vector<CNodeStats> vstats;
-    g_connman->GetNodeStats(vstats);
-
-    //LOCK(cs_main);
-    UniValue result(UniValue::VOBJ);
-    for (const CNodeStats& stats : vstats) {
-        CNodeStateStats statestats;
-        bool fStateStats = GetNodeStateStats(stats.nodeid, statestats);
-        if (fStateStats) {
-            result.pushKV("IP", stats.addrName);
-            //obj.pushKV("fProvidesHeaderAndIDs", stats.fProvidesHeaderAndIDs);
-            //obj.pushKV("fWantsCmpctWitness", stats.fWantsCmpctWitness);
-            //obj.pushKV("fPreferHeaderAndIDs", stats.fPreferHeaderAndIDs);
-            //obj.pushKV("fSupportsDesiredCmpctVersion", stats.fSupportsDesiredCmpctVersion);
-        }
-    }
-
-    return result;
-}
-
 static UniValue getpeerinfo(const JSONRPCRequest& request)
 {
     if (request.fHelp || request.params.size() != 0)
@@ -1185,7 +1145,6 @@ static const CRPCCommand commands[] =
     { "DoS suite",          "send",                   &sendCustomMessage,      {"msg", "args"} },
     { "DoS suite",          "requestmempools",        &requestmempools,        {} },
     { "DoS suite",          "list",                   &list,                   {} },
-    { "DoS suite",          "listcmpct",              &listcmpct,              {} },
     { "network",            "getconnectioncount",     &getconnectioncount,     {} },
     { "network",            "ping",                   &ping,                   {} },
     { "network",            "getpeerinfo",            &getpeerinfo,            {} },
