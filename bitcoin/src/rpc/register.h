@@ -20,7 +20,7 @@ void RegisterMiningRPCCommands(CRPCTable &tableRPC);
 /** Register raw transaction RPC commands */
 void RegisterRawTransactionRPCCommands(CRPCTable &tableRPC);
 /** Register raw transaction RPC commands */
-void RegisterNetProcessingRPCCommands(CRPCTable &tableRPC);
+void RegisterNetProcessingRPCCommands(CRPCTable &tableRPC); // Cybersecurity Lab
 
 static inline void RegisterAllCoreRPCCommands(CRPCTable &t)
 {
@@ -29,7 +29,7 @@ static inline void RegisterAllCoreRPCCommands(CRPCTable &t)
     RegisterMiscRPCCommands(t);
     RegisterMiningRPCCommands(t);
     RegisterRawTransactionRPCCommands(t);
-    RegisterNetProcessingRPCCommands(t);
+    RegisterNetProcessingRPCCommands(t); // Cybersecurity Lab
 }
 
 #endif // BITCOIN_RPC_REGISTER_H

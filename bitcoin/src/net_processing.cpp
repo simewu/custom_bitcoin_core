@@ -3949,8 +3949,8 @@ static UniValue listcmpct(const JSONRPCRequest& request)
             "[\n*\n"
                 },
                 RPCExamples{
-                    HelpExampleCli("list", "")
-            + HelpExampleRpc("list", "")
+                    HelpExampleCli("listcmpct", "")
+            + HelpExampleRpc("listcmpct", "")
                 },
             }.ToString());
 
@@ -3964,10 +3964,75 @@ static UniValue listcmpct(const JSONRPCRequest& request)
     UniValue result(UniValue::VOBJ);
 
     g_connman->ForEachNode([&result](CNode* pnode) {
-        result.pushKV("IP", pnode->addr.ToString());
+        result.pushKV("Address", pnode->addr.ToString());
         result.pushKV("fProvidesHeaderAndIDs", State(pnode->GetId())->fProvidesHeaderAndIDs);
         result.pushKV("fWantsCmpctWitness", State(pnode->GetId())->fWantsCmpctWitness);
         result.pushKV("fPreferHeaderAndIDs", State(pnode->GetId())->fPreferHeaderAndIDs);
+        result.pushKV("fSupportsDesiredCmpctVersion", State(pnode->GetId())->fSupportsDesiredCmpctVersion);
+    });
+
+    /*for (const CNodeStats& stats : vstats) {
+        CNodeStateStats statestats;
+        bool fStateStats = GetNodeStateStats(stats.nodeid, statestats);
+        if (fStateStats) {
+            result.pushKV("Address", stats.addrName);
+            result.pushKV("fProvidesHeaderAndIDs", statestats.fProvidesHeaderAndIDs);
+            result.pushKV("fWantsCmpctWitness", statestats.fWantsCmpctWitness);
+            result.pushKV("fPreferHeaderAndIDs", statestats.fPreferHeaderAndIDs);
+            result.pushKV("fSupportsDesiredCmpctVersion", statestats.fSupportsDesiredCmpctVersion);
+        }
+    }*/
+
+    return result;
+}
+
+// Cybersecurity Lab
+static UniValue listallstats(const JSONRPCRequest& request)
+{
+    if (request.fHelp || request.params.size() != 0)
+        throw std::runtime_error(
+            RPCHelpMan{"listallstats",
+                "\nGet node stats.\n",
+                {},
+                RPCResult{
+            "[\n*\n"
+                },
+                RPCExamples{
+                    HelpExampleCli("listallstats", "")
+            + HelpExampleRpc("listallstats", "")
+                },
+            }.ToString());
+
+    if(!g_connman)
+        throw JSONRPCError(RPC_CLIENT_P2P_DISABLED, "Error: Peer-to-peer functionality missing or disabled");
+
+    std::vector<CNodeStats> vstats;
+    g_connman->GetNodeStats(vstats);
+
+    //LOCK(cs_main);
+    UniValue result(UniValue::VOBJ);
+
+    g_connman->ForEachNode([&result](CNode* pnode) {
+        result.pushKV("Address", pnode->addr.ToString());
+        result.pushKV("fCurrentlyConnected", State(pnode->GetId())->fCurrentlyConnected);
+        result.pushKV("nMisbehavior", State(pnode->GetId())->nMisbehavior);
+        result.pushKV("fShouldBan", State(pnode->GetId())->fShouldBan);
+        result.pushKV("name", State(pnode->GetId())->name);
+        result.pushKV("rejects length", (State(pnode->GetId())->rejects).size());
+        result.pushKV("hashLastUnknownBlock", State(pnode->GetId())->hashLastUnknownBlock.GetHex());
+        result.pushKV("nUnconnectingHeaders", State(pnode->GetId())->nUnconnectingHeaders);
+        result.pushKV("fSyncStarted", State(pnode->GetId())->fSyncStarted);
+        result.pushKV("nHeadersSyncTimeout", State(pnode->GetId())->nHeadersSyncTimeout);
+        result.pushKV("nStallingSince", State(pnode->GetId())->nStallingSince);
+        result.pushKV("nDownloadingSince", State(pnode->GetId())->nDownloadingSince);
+        result.pushKV("nBlocksInFlight", State(pnode->GetId())->nBlocksInFlight);
+        result.pushKV("nBlocksInFlightValidHeaders", State(pnode->GetId())->nBlocksInFlightValidHeaders);
+        result.pushKV("fPreferredDownload", State(pnode->GetId())->fPreferredDownload);
+        result.pushKV("fPreferHeaders", State(pnode->GetId())->fPreferHeaders);
+        result.pushKV("fPreferHeaderAndIDs", State(pnode->GetId())->fPreferHeaderAndIDs);
+        result.pushKV("fProvidesHeaderAndIDs", State(pnode->GetId())->fProvidesHeaderAndIDs);
+        result.pushKV("fHaveWitness", State(pnode->GetId())->fHaveWitness);
+        result.pushKV("fWantsCmpctWitness", State(pnode->GetId())->fWantsCmpctWitness);
         result.pushKV("fSupportsDesiredCmpctVersion", State(pnode->GetId())->fSupportsDesiredCmpctVersion);
     });
 
@@ -3991,7 +4056,8 @@ static UniValue listcmpct(const JSONRPCRequest& request)
 static const CRPCCommand commands[] =
 { //  category              name                      actor (function)         argNames
   //  --------------------- ------------------------  -----------------------  ----------
-  { "DoS suite",          "listcmpct",              &listcmpct,              {} },
+  { "DoS suite",          "listcmpct",              &listcmpct,                {} },
+  { "DoS suite",          "listallstats",           &listallstats,             {} },
 };
 // clang-format on
 
