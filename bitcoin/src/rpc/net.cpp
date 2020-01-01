@@ -15,6 +15,7 @@
 #include <merkleblock.h> // Cybersecurity Lab
 #include <sstream> // Cybersecurity Lab
 #include <vector> // Cybersecurity Lab
+
 #include <netbase.h>
 #include <policy/policy.h>
 #include <rpc/protocol.h>
@@ -389,32 +390,6 @@ static UniValue DoS(const JSONRPCRequest& request)
       std::string msg = request.params[0].get_str();
 }*/
 
-// Cybersecurity Lab
-static UniValue getaddr(const JSONRPCRequest& request)
-{
-    if (request.fHelp || request.params.size() != 0)
-        throw std::runtime_error(
-            RPCHelpMan{"getaddr",
-                "\nRequests addresses.\n",
-                {},
-                RPCResults{},
-                RPCExamples{
-                    HelpExampleCli("getaddr", "")
-            + HelpExampleRpc("getaddr", "")
-                },
-            }.ToString());
-
-    if(!g_connman)
-        throw JSONRPCError(RPC_CLIENT_P2P_DISABLED, "Error: Peer-to-peer functionality missing or disabled");
-
-    // Request that each node send a ping during next message processing pass
-    g_connman->ForEachNode([](CNode* pnode) {
-        LOCK(pnode->cs_inventory);
-        g_connman->PushMessage(pnode, CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::GETADDR));
-    });
-    return NullUniValue;
-}
-
 static UniValue getconnectioncount(const JSONRPCRequest& request)
 {
     if (request.fHelp || request.params.size() != 0)
@@ -492,6 +467,46 @@ static UniValue list(const JSONRPCRequest& request)
         bool fStateStats = GetNodeStateStats(stats.nodeid, statestats);
         if (fStateStats) {
             result.pushKV(stats.addrName, statestats.nMisbehavior);
+        }
+    }
+
+    return result;
+}
+
+// Cybersecurity Lab
+static UniValue listcmpct(const JSONRPCRequest& request)
+{
+    if (request.fHelp || request.params.size() != 0)
+        throw std::runtime_error(
+            RPCHelpMan{"listcmpct",
+                "\nGet the sendcmpct status of each peer.\n",
+                {},
+                RPCResult{
+            "[\n*\n"
+                },
+                RPCExamples{
+                    HelpExampleCli("list", "")
+            + HelpExampleRpc("list", "")
+                },
+            }.ToString());
+
+    if(!g_connman)
+        throw JSONRPCError(RPC_CLIENT_P2P_DISABLED, "Error: Peer-to-peer functionality missing or disabled");
+
+    std::vector<CNodeStats> vstats;
+    g_connman->GetNodeStats(vstats);
+
+    //LOCK(cs_main);
+    UniValue result(UniValue::VOBJ);
+    for (const CNodeStats& stats : vstats) {
+        CNodeStateStats statestats;
+        bool fStateStats = GetNodeStateStats(stats.nodeid, statestats);
+        if (fStateStats) {
+            result.pushKV("IP", stats.addrName);
+            //obj.pushKV("fProvidesHeaderAndIDs", stats.fProvidesHeaderAndIDs);
+            //obj.pushKV("fWantsCmpctWitness", stats.fWantsCmpctWitness);
+            //obj.pushKV("fPreferHeaderAndIDs", stats.fPreferHeaderAndIDs);
+            //obj.pushKV("fSupportsDesiredCmpctVersion", stats.fSupportsDesiredCmpctVersion);
         }
     }
 
@@ -1169,8 +1184,8 @@ static const CRPCCommand commands[] =
   //  --------------------- ------------------------  -----------------------  ----------
     { "DoS suite",          "send",                   &sendCustomMessage,      {"msg", "args"} },
     { "DoS suite",          "requestmempools",        &requestmempools,        {} },
-    { "DoS suite",          "getaddr",                &getaddr,                {} },
     { "DoS suite",          "list",                   &list,                   {} },
+    { "DoS suite",          "listcmpct",              &listcmpct,              {} },
     { "network",            "getconnectioncount",     &getconnectioncount,     {} },
     { "network",            "ping",                   &ping,                   {} },
     { "network",            "getpeerinfo",            &getpeerinfo,            {} },
