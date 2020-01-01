@@ -3996,7 +3996,7 @@ static const CRPCCommand commands[] =
 // clang-format on
 
 // Cybersecurity Lab
-void RegisterBlockchainRPCCommands(CRPCTable &t)
+void RegisterNetProcessingRPCCommands(CRPCTable &t)
 {
     for (unsigned int vcidx = 0; vcidx < ARRAYLEN(commands); vcidx++)
         t.appendCommand(commands[vcidx].name, &commands[vcidx]);
