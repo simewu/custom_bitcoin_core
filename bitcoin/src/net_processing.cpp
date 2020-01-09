@@ -4038,7 +4038,7 @@ static UniValue setcmpct(const JSONRPCRequest& request)
     */
     std::string rawArgs;
     try {
-      rawArgs = request.params[1].get_str();
+      rawArgs = request.params[0].get_str();
     } catch(const std::exception& e) {
       rawArgs = "None";
     }
