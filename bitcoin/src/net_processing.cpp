@@ -4049,7 +4049,7 @@ static UniValue setcmpct(const JSONRPCRequest& request)
     while (getline(ss, item, ',')) {
         args.push_back(item);
     }
-    if(args.size() != 1) {
+    if(args.size() != 2) {
         result.pushKV("Error", "Invalid argument. Try \"setcmpct true,1\"");
         return result;
     }
