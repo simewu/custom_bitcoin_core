@@ -4050,7 +4050,7 @@ static UniValue setcmpct(const JSONRPCRequest& request)
         args.push_back(item);
     }
     if(args.size() != 2) {
-        result.pushKV("Error", "Invalid argument. Try \"setcmpct true,1\"");
+        result.pushKV("Error", "Invalid arguments, there needs to be two, separated by a comma. Try \"setcmpct true,1\"");
         return result;
     }
 

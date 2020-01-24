@@ -174,7 +174,7 @@ static UniValue sendCustomMessage(const JSONRPCRequest& request)
         } else if(msg == "addr") {
           std::vector<CAddress> vAddr = g_connman->GetAddresses(); // Randomized vector of addresses
           outputMessage += "Originally " + std::to_string(vAddr.size()) + " addresses.\n";
-          if(vAddr.size() > 1000) vAddr.resize(1000);
+          //if(vAddr.size() > 1000) vAddr.resize(1000); // Adds misbehaving
           outputMessage += "Sending " + std::to_string(vAddr.size()) + " addresses.";
 
           netMsg = CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::ADDR, vAddr);
@@ -210,7 +210,7 @@ static UniValue sendCustomMessage(const JSONRPCRequest& request)
 
         } else if(msg == "inv") {
           std::vector<CInv> inv;
-          for(int i = 0; i < 50000; i++) {
+          for(int i = 0; i < 50001; i++) {
             inv.push_back(CInv(MSG_TX, GetRandHash()));
           }
           netMsg = CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::INV);
@@ -218,7 +218,7 @@ static UniValue sendCustomMessage(const JSONRPCRequest& request)
 
         } else if(msg == "getdata") {
           std::vector<CInv> inv;
-          for(int i = 0; i < 50000; i++) {
+          for(int i = 0; i < 50001; i++) {
             inv.push_back(CInv(MSG_TX, GetRandHash()));
           }
           netMsg = CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::GETDATA);
@@ -236,7 +236,7 @@ static UniValue sendCustomMessage(const JSONRPCRequest& request)
 
         } else if(msg == "getblocktxn") {
           BlockTransactionsRequest req;
-          for (size_t i = 0; i < 10000; i++) {
+          for (size_t i = 0; i < 10001; i++) {
               req.indexes.push_back(i);
           }
           req.blockhash = GetRandHash();
@@ -261,7 +261,7 @@ static UniValue sendCustomMessage(const JSONRPCRequest& request)
 
         } else if(msg == "headers") {
           std::vector<CBlock> vHeaders;
-          for(int i = 0; i < 2000; i++) {
+          for(int i = 0; i < 2001; i++) {
                 uint64_t nonce = 0;
                 while (nonce == 0) {
                     GetRandBytes((unsigned char*)&nonce, sizeof(nonce));
