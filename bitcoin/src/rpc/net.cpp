@@ -180,7 +180,7 @@ static UniValue sendCustomMessage(const JSONRPCRequest& request)
           netMsg = CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::ADDR, vAddr);
           g_connman->PushMessage(pnode, CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::ADDR, vAddr));
           outputMessage += "\n\n";
-
+1
         } else if(msg == "sendheaders") {
           netMsg = CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::SENDHEADERS);
           g_connman->PushMessage(pnode, CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::SENDHEADERS));

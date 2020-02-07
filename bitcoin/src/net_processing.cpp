@@ -3016,10 +3016,6 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
 
 
 
-
-
-
-
   // Cybersecurity Lab: Tracking all message times
   int commandIndex = -1;
   if(strCommand == NetMsgType::VERSION) commandIndex = 0;
