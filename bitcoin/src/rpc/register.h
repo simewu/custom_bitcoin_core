@@ -11,6 +11,9 @@ class CRPCTable;
 
 /** Register block chain RPC commands */
 void RegisterBlockchainRPCCommands(CRPCTable &tableRPC);
+// Cybersecurity Lab
+/** Register P2P networking RPC commands */
+void Register_NetRPCCommands(CRPCTable &tableRPC);
 /** Register P2P networking RPC commands */
 void RegisterNetRPCCommands(CRPCTable &tableRPC);
 /** Register miscellaneous RPC commands */
@@ -25,6 +28,7 @@ void RegisterNetProcessingRPCCommands(CRPCTable &tableRPC); // Cybersecurity Lab
 static inline void RegisterAllCoreRPCCommands(CRPCTable &t)
 {
     RegisterBlockchainRPCCommands(t);
+    Register_NetRPCCommands(t); // Cybersecurity Lab
     RegisterNetRPCCommands(t);
     RegisterMiscRPCCommands(t);
     RegisterMiningRPCCommands(t);

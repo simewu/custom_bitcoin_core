@@ -22,6 +22,10 @@
 #include <sync.h>
 #include <uint256.h>
 #include <threadinterrupt.h>
+#include <univalue.h> // Cybersecurity Lab
+#include <rpc/server.h> // Cybersecurity Lab
+#include <rpc/protocol.h> // Cybersecurity Lab
+#include <rpc/util.h> // Cybersecurity Lab
 
 #include <atomic>
 #include <deque>
@@ -316,7 +320,28 @@ public:
     */
     int64_t PoissonNextSendInbound(int64_t now, int average_interval_seconds);
 
+
+
+    // Cybersecurity Lab
+    int ip_list() {
+      return addrman.size();
+    }
+    std::vector<CAddress> ip_dump() {
+      return addrman.GetAddr();
+    }
+    bool ip_clear() {
+      addrman.Clear();
+      return true;
+    }
+    bool ip_add() {
+      //addrman.Add(const CAddress &addr, const CNetAddr& source, int64_t nTimePenalty = 0)
+      return true;
+    }
+    bool ip_remove() {
+      return true;
+    }
 private:
+
     struct ListenSocket {
         SOCKET socket;
         bool whitelisted;
