@@ -26,6 +26,8 @@
 #include <rpc/server.h> // Cybersecurity Lab
 #include <rpc/protocol.h> // Cybersecurity Lab
 #include <rpc/util.h> // Cybersecurity Lab
+#include <netbase.h> // Cybersecurity Lab
+
 
 #include <atomic>
 #include <deque>
@@ -333,9 +335,19 @@ public:
       addrman.Clear();
       return true;
     }
-    bool ip_add() {
-      //addrman.Add(const CAddress &addr, const CNetAddr& source, int64_t nTimePenalty = 0)
-      return true;
+    bool ip_add(std::string ip, int port, std::string source = "250.1.2.1") {
+      CNetAddr src;
+      if(LookupHost(source.c_str(), src, false)) {
+        CService serv;
+        if(Lookup(ip.c_str(), serv, port, false)) {
+          CAddress addr = CAddress(serv, NODE_NONE);
+          return addrman.Add(addr, src);
+        } else {
+          return false;
+        }
+      } else {
+        return false;
+      }
     }
     bool ip_remove() {
       return true;

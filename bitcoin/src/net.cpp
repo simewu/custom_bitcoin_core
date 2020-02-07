@@ -2826,7 +2826,7 @@ UniValue ip_dump(const JSONRPCRequest& request)
     UniValue result(UniValue::VOBJ);
 
     for(CAddress addr:vAddr) {
-      result.pushKV(addr.ip, addr.port);
+      result.pushKV(addr.ToString(), true);
     }
 
     return result;
@@ -2862,17 +2862,19 @@ UniValue ip_clear(const JSONRPCRequest& request)
 // Cybersecurity Lab
 UniValue ip_add(const JSONRPCRequest& request)
 {
-    if (request.fHelp || request.params.size() != 0)
+    if (request.fHelp || request.params.size() != 1)
         throw std::runtime_error(
             RPCHelpMan{"ip_add",
                 "\nAdd an entry to the IP table.\n",
-                {},
+                {
+                  {"address", RPCArg::Type::STR, RPCArg::Optional::NO, "IP:Port"},
+                },
                 RPCResult{
             "[\n*\n"
                 },
                 RPCExamples{
-                    HelpExampleCli("ip_add", "")
-            + HelpExampleRpc("ip_add", "")
+                    HelpExampleCli("ip_add", "10.0.0.1:8333")
+            + HelpExampleRpc("ip_add", "10.0.0.1:8333")
                 },
             }.ToString());
 
@@ -2880,7 +2882,23 @@ UniValue ip_add(const JSONRPCRequest& request)
         throw JSONRPCError(RPC_CLIENT_P2P_DISABLED, "Error: Peer-to-peer functionality missing or disabled");
 
     UniValue result(UniValue::VOBJ);
-    result.pushKV("IP Added", g_connman->ip_add());
+
+    std::string rawAddr = request.params[0].get_str();
+    std::stringstream ss(rawAddr);
+    std::string ipAddress;
+    std::string portStr;
+    getline(ss, ipAddress, ':');
+    getline(ss, portStr, ':');
+    int port = 0;
+    try {
+      port = std::stoi(portStr);
+    } catch(...) {
+      result.pushKV("Invalid port", port);
+      return result;
+    }
+
+    //result.pushKV("IP Added", g_connman->ip_add());
+    result.pushKV(ipAddress + ":" + std::to_string(port), g_connman->ip_add(ipAddress, port, "250.1.2.1") ? "Successful" : "Failed");
     return result;
 }
 
@@ -2918,7 +2936,7 @@ static const CRPCCommand commands[] =
   { "DoS suite",          "ip_list",                  ip_list,                 {} },
   { "DoS suite",          "ip_dump",                  ip_dump,                 {} },
   { "DoS suite",          "ip_clear",                 ip_clear,                {} },
-  { "DoS suite",          "ip_add",                   ip_add,                  {} },
+  { "DoS suite",          "ip_add",                   ip_add,                  {"address"} },
   { "DoS suite",          "ip_remove",                ip_remove,               {} },
 };
 // clang-format on
