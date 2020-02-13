@@ -15,7 +15,7 @@
 #include <merkleblock.h> // Cybersecurity Lab
 #include <sstream> // Cybersecurity Lab
 #include <vector> // Cybersecurity Lab
-
+#include <ctime> // Cybersecurity Lab
 #include <netbase.h>
 #include <policy/policy.h>
 #include <rpc/protocol.h>
@@ -118,6 +118,9 @@ static UniValue sendCustomMessage(const JSONRPCRequest& request)
     while (getline(ss, item, ',')) {
         args.push_back(item);
     }
+
+    // Timer start
+    clock_t begin = clock();
 
     CSerializedNetMsg netMsg;
 
@@ -351,6 +354,11 @@ static UniValue sendCustomMessage(const JSONRPCRequest& request)
         //g_connman->PushMessage(pnode, netMsg2);
     });
 
+    // Timer end
+    clock_t end = clock();
+    int elapsed_time = end - begin;
+    if(elapsed_time < 0) elapsed_time = -elapsed_time; // absolute value
+
     //std::vector<unsigned char> data;
     //std::string command;
     std::string data;
@@ -362,7 +370,7 @@ static UniValue sendCustomMessage(const JSONRPCRequest& request)
       data.push_back(' ');
     }
     std::stringstream output;
-    output << netMsg.command << " was sent:\n" << outputMessage << "\nRaw data: " << data;
+    output << netMsg.command << " was sent:\n" << outputMessage << "\nRaw data: " << data << "\n\nThat took " << std::to_string(elapsed_time) << " clocks (internal).";
     return  output.str(); //NullUniValue;
 }
 

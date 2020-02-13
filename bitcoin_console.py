@@ -48,9 +48,14 @@ def console(width):
 			count += 1
 		print()
 
+		timeStart = time.perf_counter()
 		for i in range(numTimes - 1):
 			bitcoin(cmd)
-		print(bitcoin(cmd))
+		output = bitcoin(cmd)
+		timeEnd = time.perf_counter()
+
+		print(output)
+		print(f'That took {str(timeEnd - timeStart)} seconds (external console).')
 		print('-' * width)
 
 console(80)
