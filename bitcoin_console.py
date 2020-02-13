@@ -48,14 +48,48 @@ def console(width):
 			count += 1
 		print()
 
-		timeStart = time.perf_counter()
+		internalTime = 0
+		externalTime = 0
 		for i in range(numTimes - 1):
-			bitcoin(cmd)
-		output = bitcoin(cmd)
-		timeEnd = time.perf_counter()
+			# Internal
+			t1 = time.perf_counter()
+			output = bitcoin(cmd)
+			t2 = time.perf_counter()
+			externalTime += t2 - t1
 
-		print(output)
-		print(f'That took {str(timeEnd - timeStart)} seconds (external console).')
+			# External
+			t = re.search(r'That took ([0-9\.]+) clocks', output)
+			if t != None:
+				internalTime += float(t.group(1))
+
+		
+		# Internal
+		t1 = time.perf_counter()
+		output = bitcoin(cmd)
+		t2 = time.perf_counter()
+		externalTime += t2 - t1
+
+		# External
+		t = re.search(r'That took ([0-9\.]+) clocks', output)
+		if t != None:
+			internalTime += float(t.group(1))
+
+		internalTime /= numTimes
+		externalTime /= numTimes
+
+		if numTimes == 1:
+			print(output)
+			print(f'That took {externalTime} seconds (external).')
+		else:
+			if t != None:
+				# Remove the built in "That took ... clocks"
+				print('\n'.join(map(str, output.split('\n')[:-2])))
+			else:
+				print(output)
+			print(f'Number of samples: {numTimes}.')
+			print(f'Average time (Internal Bitcoin): {internalTime} clocks.')
+			print(f'Average time (External Console): {externalTime} seconds.')
+
 		print('-' * width)
 
 console(80)
