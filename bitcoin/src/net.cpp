@@ -2887,6 +2887,7 @@ UniValue ip_add(const JSONRPCRequest& request)
     std::stringstream ss(rawAddr);
     std::string ipAddress;
     std::string portStr;
+    // TODO: Split by the last colon, not the first
     getline(ss, ipAddress, ':'); // Split the assignment into IP:Port
     getline(ss, portStr, ':');
     int port = 0;

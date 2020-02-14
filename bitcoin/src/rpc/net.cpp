@@ -175,10 +175,16 @@ static UniValue sendCustomMessage(const JSONRPCRequest& request)
           g_connman->PushMessage(pnode, CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::VERACK));
 
         } else if(msg == "addr") {
+          /*std::vector<CAddress> vAddr;
+          for(int i = 0; i < 1000; i++) {
+            vAddr.push_back(CAddress(CService("250.1.1.3", 8333), NODE_NONE))
+          }*/
+          // /*
           std::vector<CAddress> vAddr = g_connman->GetAddresses(); // Randomized vector of addresses
           outputMessage += "Originally " + std::to_string(vAddr.size()) + " addresses.\n";
           //if(vAddr.size() > 1000) vAddr.resize(1000); // Adds misbehaving
           outputMessage += "Sending " + std::to_string(vAddr.size()) + " addresses.";
+          // */
 
           netMsg = CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::ADDR, vAddr);
           g_connman->PushMessage(pnode, CNetMsgMaker(PROTOCOL_VERSION).Make(NetMsgType::ADDR, vAddr));

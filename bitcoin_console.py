@@ -2,6 +2,7 @@ import os
 import json
 import time
 import re
+import readline
 
 datadir = '/media/sim/BITCOIN/' # Virtual machine shared folder
 if os.path.exists('/media/sf_Bitcoin'):
@@ -50,7 +51,7 @@ def console(width):
 
 		internalTime = 0
 		externalTime = 0
-		for i in range(numTimes - 1):
+		for i in range(numTimes):
 			# Internal
 			t1 = time.perf_counter()
 			output = bitcoin(cmd)
@@ -61,18 +62,6 @@ def console(width):
 			t = re.search(r'That took ([0-9\.]+) clocks', output)
 			if t != None:
 				internalTime += float(t.group(1))
-
-		
-		# Internal
-		t1 = time.perf_counter()
-		output = bitcoin(cmd)
-		t2 = time.perf_counter()
-		externalTime += t2 - t1
-
-		# External
-		t = re.search(r'That took ([0-9\.]+) clocks', output)
-		if t != None:
-			internalTime += float(t.group(1))
 
 		internalTime /= numTimes
 		externalTime /= numTimes
