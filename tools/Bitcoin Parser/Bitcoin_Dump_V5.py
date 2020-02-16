@@ -3,8 +3,8 @@ from blockchain_parser.blockchain import Blockchain
 
 bitcoinPath = '/media/sim/BITCOIN/blocks'
 #bitcoinPath = '/home/sim/.bitcoin/blocks' #'/media/sim/BITCOIN/blocks'
-startHeight = 0
-endHeight = 581300
+startHeight = 605534
+endHeight = 617600
 
 if not os.path.exists(bitcoinPath):
 	print(bitcoinPath + ' does not exist.')
